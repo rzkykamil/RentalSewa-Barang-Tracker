@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RenterBookingCard } from "@/components/bookings/RenterBookingCard";
 import { renterBookingsCopy } from "@/lib/copy/bookings";
 import { getBookingsByRenter } from "@/lib/mock/bookings";
+import { getPaymentByBookingId } from "@/lib/mock/payments";
 import { MOCK_USERS } from "@/lib/mock/session";
 
 export const metadata: Metadata = {
@@ -30,7 +31,11 @@ export default function RenterBookingsPage() {
       ) : (
         <div className="flex flex-col gap-4">
           {bookings.map((booking) => (
-            <RenterBookingCard key={booking.id} booking={booking} />
+            <RenterBookingCard
+              key={booking.id}
+              booking={booking}
+              payment={getPaymentByBookingId(booking.id)}
+            />
           ))}
         </div>
       )}

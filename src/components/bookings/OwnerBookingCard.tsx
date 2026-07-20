@@ -2,16 +2,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
+import { OwnerPaymentForm } from "@/components/payments/OwnerPaymentForm";
 import { ownerBookingsCopy } from "@/lib/copy/bookings";
 import type { MockBooking } from "@/lib/mock/bookings";
+import { bookingHasPayment, type MockPayment, type PaymentStatus } from "@/lib/mock/payments";
 import { formatRupiah } from "@/lib/utils";
 
 interface OwnerBookingCardProps {
   booking: MockBooking;
+  payment: MockPayment | null;
   onApprove: () => void;
   onReject: () => void;
   onMarkActive: () => void;
   onMarkCompleted: () => void;
+  onUpdatePayment: (status: PaymentStatus, methodNote: string | null) => void;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
@@ -21,10 +25,12 @@ function formatDateRange(startDate: string, endDate: string): string {
 
 export function OwnerBookingCard({
   booking,
+  payment,
   onApprove,
   onReject,
   onMarkActive,
   onMarkCompleted,
+  onUpdatePayment,
 }: OwnerBookingCardProps) {
   return (
     <Card>
@@ -102,6 +108,10 @@ export function OwnerBookingCard({
               onConfirm={onMarkCompleted}
             />
           </div>
+        )}
+
+        {bookingHasPayment(booking.status) && (
+          <OwnerPaymentForm bookingId={booking.id} payment={payment} onSave={onUpdatePayment} />
         )}
       </CardContent>
     </Card>

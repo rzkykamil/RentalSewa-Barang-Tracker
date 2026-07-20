@@ -1,12 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { BookingTimeline } from "@/components/bookings/BookingTimeline";
+import { PaymentStatusDisplay } from "@/components/payments/PaymentStatusDisplay";
 import { renterBookingsCopy } from "@/lib/copy/bookings";
 import type { MockBooking } from "@/lib/mock/bookings";
+import { bookingHasPayment, type MockPayment } from "@/lib/mock/payments";
 import { formatRupiah } from "@/lib/utils";
 
 interface RenterBookingCardProps {
   booking: MockBooking;
+  payment: MockPayment | null;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
@@ -14,7 +17,7 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${formatter.format(new Date(startDate))} — ${formatter.format(new Date(endDate))}`;
 }
 
-export function RenterBookingCard({ booking }: RenterBookingCardProps) {
+export function RenterBookingCard({ booking, payment }: RenterBookingCardProps) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
@@ -48,6 +51,8 @@ export function RenterBookingCard({ booking }: RenterBookingCardProps) {
         ) : (
           <BookingTimeline status={booking.status} />
         )}
+
+        {bookingHasPayment(booking.status) && <PaymentStatusDisplay payment={payment} />}
       </CardContent>
     </Card>
   );

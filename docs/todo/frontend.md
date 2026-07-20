@@ -24,8 +24,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Tombol Owner: tandai aktif / tandai selesai
 
 ## Modul Payment Tracking
-- [ ] UI Owner: tandai status pembayaran (LUNAS/BELUM_LUNAS) + catatan metode
-- [ ] Tampilkan status pembayaran di detail booking (Owner & Renter)
+- [x] UI Owner: tandai status pembayaran (LUNAS/BELUM_LUNAS) + catatan metode
+- [x] Tampilkan status pembayaran di detail booking (Owner & Renter)
 
 ## Modul History
 - [ ] Halaman riwayat transaksi per user (filter status, urut tanggal)
