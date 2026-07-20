@@ -32,14 +32,14 @@ export interface DashboardNavItem {
 export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
   OWNER: [
     { label: "Dashboard", href: "/owner/dashboard", icon: LayoutDashboard },
-    { label: "Barang Saya", href: "/owner/items", icon: PackageSearch, comingSoon: true },
+    { label: "Barang Saya", href: "/owner/items", icon: PackageSearch },
     { label: "Request Masuk", href: "/owner/bookings", icon: ClipboardList, comingSoon: true },
     { label: "Riwayat Transaksi", href: "/owner/history", icon: History, comingSoon: true },
     { label: "Profil", href: "/owner/profile", icon: User },
   ],
   RENTER: [
     { label: "Dashboard", href: "/renter/dashboard", icon: LayoutDashboard },
-    { label: "Jelajah Barang", href: "/renter/browse", icon: PackageSearch, comingSoon: true },
+    { label: "Jelajah Barang", href: "/renter/browse", icon: PackageSearch },
     { label: "Booking Saya", href: "/renter/bookings", icon: ClipboardList, comingSoon: true },
     { label: "Riwayat & Review", href: "/renter/history", icon: Star, comingSoon: true },
     { label: "Profil", href: "/renter/profile", icon: User },

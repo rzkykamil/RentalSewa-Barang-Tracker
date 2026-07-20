@@ -10,11 +10,11 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] State loading/error untuk form auth
 
 ## Modul Barang (Item)
-- [ ] Form tambah barang (nama, deskripsi, kategori, kondisi, harga/hari, upload multi-foto) — mock data dulu
-- [ ] Form edit barang + tombol nonaktifkan
-- [ ] Halaman daftar barang milik Owner (dengan badge status)
-- [ ] Halaman Browse & Discovery (grid card, filter kategori & rentang harga, sort harga)
-- [ ] Halaman detail barang (galeri foto, kondisi, harga, rating rata-rata, tombol ajukan sewa)
+- [x] Form tambah barang (nama, deskripsi, kategori, kondisi, harga/hari, upload multi-foto) — mock data dulu
+- [x] Form edit barang + tombol nonaktifkan
+- [x] Halaman daftar barang milik Owner (dengan badge status)
+- [x] Halaman Browse & Discovery (grid card, filter kategori & rentang harga, sort harga)
+- [x] Halaman detail barang (galeri foto, kondisi, harga, rating rata-rata, tombol ajukan sewa)
 
 ## Modul Booking
 - [ ] Form ajukan request sewa (pilih rentang tanggal, preview total harga)
