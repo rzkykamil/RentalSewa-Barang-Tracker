@@ -35,3 +35,4 @@ Thumbs.db
 *.swp
 
 /src/generated/prisma
+*.tsbuildinfo

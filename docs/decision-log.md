@@ -45,6 +45,13 @@ Log keputusan arsitektur penting (format ADR ringan). Setiap entry baru ditambah
 - **Alasan:** microservices penuh menambah beban operasional (deployment terpisah, network overhead) yang tidak sepadan dengan skala & ukuran tim saat ini.
 - **Dampak:** kalau salah satu modul (misal reminder job) perlu di-scale independen di masa depan, migrasi ke service terpisah tetap dimungkinkan berkat pemisahan modul yang sudah rapi — dicatat di `docs/technical-spec.md`.
 
+## [2026-07-20] Design tokens dasar ditambahkan lebih awal di `globals.css` (bukan menunggu item cross-cutting terpisah)
+
+- **Konteks:** komponen `src/components/ui/*` (shadcn) sudah digenerate dan wajib dipakai (`bg-primary`, `bg-destructive`, `bg-card`, `ring-ring`, dsb.), tapi `src/app/globals.css` belum mendefinisikan CSS variable-nya (`docs/todo/frontend.md` "Setup design tokens" masih belum dicentang). Tanpa token, semua komponen UI (Button, Input, Card, Select, dsb.) render tanpa warna sama sekali.
+- **Keputusan:** menambahkan `@theme` token minimal (background/foreground/primary/secondary/muted/accent/destructive/border/input/ring + light & dark) langsung saat mengerjakan modul Auth (Periode 1), sekaligus menambahkan token warna status (`--color-status-positive/pending/active/late/inactive`) sesuai palet di `docs/design-system.md` §2 supaya siap dipakai `BookingStatusBadge` nanti.
+- **Alasan:** ini prasyarat teknis, bukan pekerjaan modul lain — tanpa token, komponen yang diwajibkan dipakai di modul Auth tidak bisa direview secara visual sama sekali. Warna brand primer dipilih biru (`oklch(0.5 0.19 255)`) sesuai opsi di design-system.md.
+- **Dampak:** item cross-cutting "Setup design tokens" di `docs/todo/frontend.md` sudah sebagian terpenuhi oleh perubahan ini — perlu dicek ulang & disesuaikan (bukan dibuat dari nol) saat modul Barang/Booking mengerjakan komponen status & card lain yang mungkin butuh token tambahan.
+
 ## [2026-07-20] Prisma Client generator baru (`prisma-client`) dengan driver adapter `@prisma/adapter-pg`
 
 - **Konteks:** setup awal project memakai Prisma versi terbaru (7.8.0). Generator client default di versi ini (`prisma-client`, output ke `src/generated/prisma`) tidak lagi menyertakan query engine binary bawaan — client mengharuskan driver adapter eksplisit untuk terhubung ke database, dan koneksi DB tidak lagi dibaca otomatis dari `datasource.url` di `schema.prisma` (dipindah ke `prisma.config.ts` untuk kebutuhan CLI).

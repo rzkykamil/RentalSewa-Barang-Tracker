@@ -3,11 +3,11 @@
 Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan mengikuti jadwal fokus di `docs/development-workflow.md`.
 
 ## Modul Auth
-- [ ] Halaman registrasi dengan pilihan role (Owner/Renter)
-- [ ] Halaman login
-- [ ] Layout dashboard terpisah per role (Owner/Renter/Admin) sesuai `docs/prd.md` permission matrix
-- [ ] Halaman edit profil (nama, phone, avatar)
-- [ ] State loading/error untuk form auth
+- [x] Halaman registrasi dengan pilihan role (Owner/Renter)
+- [x] Halaman login
+- [x] Layout dashboard terpisah per role (Owner/Renter/Admin) sesuai `docs/prd.md` permission matrix
+- [x] Halaman edit profil (nama, phone, avatar)
+- [x] State loading/error untuk form auth
 
 ## Modul Barang (Item)
 - [ ] Form tambah barang (nama, deskripsi, kategori, kondisi, harga/hari, upload multi-foto) — mock data dulu
