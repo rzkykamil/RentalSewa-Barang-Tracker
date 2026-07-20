@@ -36,8 +36,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Halaman/list notifikasi in-app
 
 ## Modul Rating/Review
-- [ ] Form beri rating (1-5) + komentar, muncul hanya untuk booking COMPLETED
-- [ ] Tampilkan daftar review & rata-rata rating di halaman detail barang
+- [x] Form beri rating (1-5) + komentar, muncul hanya untuk booking COMPLETED
+- [x] Tampilkan daftar review & rata-rata rating di halaman detail barang
 
 ## Modul Admin
 - [ ] Halaman daftar seluruh user + aksi nonaktifkan

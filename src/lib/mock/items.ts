@@ -195,10 +195,21 @@ export function getItemPhotos(itemId: string): MockItemPhoto[] {
   );
 }
 
-/** Mocked review, since Modul Rating/Review has not been built yet. */
+/**
+ * Mocked review, since Modul Rating/Review has not been built yet.
+ *
+ * `bookingId`/`renterId` were added alongside the "Beri Rating" form
+ * (docs/todo/frontend.md Modul Rating/Review) so a completed booking can be
+ * checked for an existing review. Seed reviews below predate real booking
+ * records and belong to renters who aren't MOCK_USERS.RENTER, so their
+ * `bookingId`/`renterId` are `null` — only reviews created via the new
+ * mock ReviewForm are expected to carry a real booking/renter id.
+ */
 export interface MockReview {
   id: string;
   itemId: string;
+  bookingId: string | null;
+  renterId: string | null;
   renterName: string;
   rating: number;
   comment: string;
@@ -209,6 +220,8 @@ export const MOCK_REVIEWS: MockReview[] = [
   {
     id: "review-1",
     itemId: "item-1",
+    bookingId: null,
+    renterId: null,
     renterName: "Siti Aminah",
     rating: 5,
     comment: "Kamera bersih dan hasil fotonya bagus, owner responsif.",
@@ -217,6 +230,8 @@ export const MOCK_REVIEWS: MockReview[] = [
   {
     id: "review-2",
     itemId: "item-1",
+    bookingId: null,
+    renterId: null,
     renterName: "Rian Hidayat",
     rating: 4,
     comment: "Sesuai deskripsi, hanya baterai agak cepat habis.",
@@ -225,6 +240,8 @@ export const MOCK_REVIEWS: MockReview[] = [
   {
     id: "review-3",
     itemId: "item-5",
+    bookingId: null,
+    renterId: null,
     renterName: "Siti Aminah",
     rating: 5,
     comment: "Suara jernih, cocok untuk acara kecil di rumah.",
@@ -233,12 +250,19 @@ export const MOCK_REVIEWS: MockReview[] = [
   {
     id: "review-4",
     itemId: "item-6",
+    bookingId: null,
+    renterId: null,
     renterName: "Budi Santoso",
     rating: 3,
     comment: "Sepeda oke, tapi rantai agak berisik.",
     createdAt: "2026-06-05T08:00:00.000Z",
   },
 ];
+
+/** Whether a given booking already has a review recorded in MOCK_REVIEWS. */
+export function hasReviewForBooking(bookingId: string): boolean {
+  return MOCK_REVIEWS.some((review) => review.bookingId === bookingId);
+}
 
 /** Aggregated rating for an item, or null if it has no reviews yet. */
 export function getItemRating(itemId: string): { average: number; count: number } | null {

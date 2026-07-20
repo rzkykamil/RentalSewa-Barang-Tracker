@@ -1,9 +1,24 @@
+"use client";
+
+import * as React from "react";
+
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { BookingTimeline } from "@/components/bookings/BookingTimeline";
 import { PaymentStatusDisplay } from "@/components/payments/PaymentStatusDisplay";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { renterBookingsCopy } from "@/lib/copy/bookings";
+import { reviewFormCopy } from "@/lib/copy/reviews";
 import type { MockBooking } from "@/lib/mock/bookings";
+import { hasReviewForBooking } from "@/lib/mock/items";
 import { bookingHasPayment, type MockPayment } from "@/lib/mock/payments";
 import { formatRupiah } from "@/lib/utils";
 
@@ -18,6 +33,10 @@ function formatDateRange(startDate: string, endDate: string): string {
 }
 
 export function RenterBookingCard({ booking, payment }: RenterBookingCardProps) {
+  const [reviewDialogOpen, setReviewDialogOpen] = React.useState(false);
+  const [justReviewed, setJustReviewed] = React.useState(false);
+  const canReview = booking.status === "COMPLETED" && !hasReviewForBooking(booking.id) && !justReviewed;
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
@@ -53,6 +72,32 @@ export function RenterBookingCard({ booking, payment }: RenterBookingCardProps) 
         )}
 
         {bookingHasPayment(booking.status) && <PaymentStatusDisplay payment={payment} />}
+
+        {booking.status === "COMPLETED" &&
+          (canReview ? (
+            <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="self-start">
+                  {reviewFormCopy.trigger}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{reviewFormCopy.dialogTitle}</DialogTitle>
+                </DialogHeader>
+                <ReviewForm
+                  bookingId={booking.id}
+                  itemName={booking.itemName}
+                  onSubmitted={() => {
+                    setJustReviewed(true);
+                    setReviewDialogOpen(false);
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <p className="text-sm font-medium text-status-positive">{reviewFormCopy.alreadyReviewed}</p>
+          ))}
       </CardContent>
     </Card>
   );
