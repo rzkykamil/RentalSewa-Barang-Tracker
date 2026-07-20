@@ -17,11 +17,11 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Halaman detail barang (galeri foto, kondisi, harga, rating rata-rata, tombol ajukan sewa)
 
 ## Modul Booking
-- [ ] Form ajukan request sewa (pilih rentang tanggal, preview total harga)
-- [ ] Dashboard Owner: daftar request masuk dengan aksi approve/reject
-- [ ] Halaman "booking saya" (Renter): daftar booking + status timeline visual (PENDING → APPROVED → ACTIVE → COMPLETED)
-- [ ] Komponen `BookingStatusBadge` (mapping warna status sesuai `docs/design-system.md`)
-- [ ] Tombol Owner: tandai aktif / tandai selesai
+- [x] Form ajukan request sewa (pilih rentang tanggal, preview total harga)
+- [x] Dashboard Owner: daftar request masuk dengan aksi approve/reject
+- [x] Halaman "booking saya" (Renter): daftar booking + status timeline visual (PENDING → APPROVED → ACTIVE → COMPLETED)
+- [x] Komponen `BookingStatusBadge` (mapping warna status sesuai `docs/design-system.md`)
+- [x] Tombol Owner: tandai aktif / tandai selesai
 
 ## Modul Payment Tracking
 - [ ] UI Owner: tandai status pembayaran (LUNAS/BELUM_LUNAS) + catatan metode

@@ -103,16 +103,22 @@ export default async function ItemDetailPage({ params }: ItemDetailPageProps) {
             </p>
           </div>
 
-          {/* Booking flow (Modul Booking) is a future periode — this button is a
-              visual stub only and intentionally does not open any request form. */}
-          <Button
-            size="lg"
-            disabled={!canRequest}
-            title={canRequest ? undefined : itemDetailCopy.requestButtonDisabledHint}
-            className="mt-2 w-full sm:w-auto"
-          >
-            {itemDetailCopy.requestButton}
-          </Button>
+          {canRequest ? (
+            <Button asChild size="lg" className="mt-2 w-full sm:w-auto">
+              <Link href={`/renter/browse/${item.id}/request`}>
+                {itemDetailCopy.requestButton}
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              disabled
+              title={itemDetailCopy.requestButtonDisabledHint}
+              className="mt-2 w-full sm:w-auto"
+            >
+              {itemDetailCopy.requestButton}
+            </Button>
+          )}
         </div>
       </div>
 

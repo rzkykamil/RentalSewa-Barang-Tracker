@@ -117,7 +117,7 @@ export const itemDetailCopy = {
   descriptionTitle: "Deskripsi",
   reviewsTitle: "Ulasan Penyewa",
   requestButton: "Ajukan Sewa",
-  requestButtonDisabledHint: "Fitur pengajuan sewa segera hadir.",
+  requestButtonDisabledHint: "Barang ini sedang tidak tersedia untuk disewa.",
   notFoundTitle: "Barang tidak ditemukan",
   notFoundDescription: "Barang yang Anda cari mungkin sudah dihapus atau tidak tersedia.",
   backToBrowse: "Kembali ke Jelajah Barang",

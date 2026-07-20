@@ -63,3 +63,5 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
+
+- **`bookings.activated_at` kolom belum ada di `docs/database-design.md`:** endpoint `PATCH /api/v1/bookings/:id/activate` sudah direncanakan di atas, tapi tabel `bookings` di `docs/database-design.md` §2 hanya punya `approved_at / rejected_at / completed_at` — tidak ada timestamp khusus transisi APPROVED → ACTIVE. Ditemukan saat mengerjakan frontend Modul Booking (mock data `src/lib/mock/bookings.ts` menambahkan field `activatedAt` supaya timeline UI PENDING → APPROVED → ACTIVE → COMPLETED punya sumber data konsisten). Perlu ditambahkan ke skema saat migrasi Modul Booking dikerjakan.
