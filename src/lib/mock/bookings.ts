@@ -117,7 +117,11 @@ export const MOCK_BOOKINGS: MockBooking[] = [
     renterId: MOCK_USERS.RENTER.id,
     renterName: MOCK_USERS.RENTER.name,
     startDate: "2026-07-10",
-    endDate: "2026-07-20",
+    // Due tomorrow relative to MOCK_TODAY in src/lib/mock/reminders.ts —
+    // deliberately chosen so this booking produces an H1_REMINDER for both
+    // MOCK_USERS.OWNER and MOCK_USERS.RENTER (see docs/todo/frontend.md
+    // Modul Reminder).
+    endDate: "2026-07-21",
     status: "ACTIVE",
     notes: "Tolong sertakan pasak cadangan.",
     requestedAt: "2026-07-05T08:00:00.000Z",
@@ -216,6 +220,26 @@ export const MOCK_BOOKINGS: MockBooking[] = [
     approvedAt: "2026-06-05T13:00:00.000Z",
     activatedAt: "2026-06-10T08:00:00.000Z",
     completedAt: "2026-06-15T16:00:00.000Z",
+    rejectedAt: null,
+  }),
+
+  // Overdue example: still ACTIVE 3 days past its due date relative to
+  // MOCK_TODAY in src/lib/mock/reminders.ts, so it produces an
+  // OVERDUE_ALERT for both MOCK_USERS.OWNER and MOCK_USERS.RENTER — see
+  // docs/todo/frontend.md Modul Reminder.
+  buildBooking({
+    id: "booking-10",
+    itemId: "item-3",
+    renterId: MOCK_USERS.RENTER.id,
+    renterName: MOCK_USERS.RENTER.name,
+    startDate: "2026-07-05",
+    endDate: "2026-07-17",
+    status: "ACTIVE",
+    notes: null,
+    requestedAt: "2026-07-01T08:00:00.000Z",
+    approvedAt: "2026-07-01T13:00:00.000Z",
+    activatedAt: "2026-07-05T08:00:00.000Z",
+    completedAt: null,
     rejectedAt: null,
   }),
 ];

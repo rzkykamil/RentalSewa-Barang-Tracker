@@ -32,8 +32,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Halaman riwayat transaksi per barang (dilihat dari detail barang, khusus Owner)
 
 ## Modul Reminder
-- [ ] Komponen notifikasi in-app (badge/counter) untuk reminder H-1 & overdue
-- [ ] Halaman/list notifikasi in-app
+- [x] Komponen notifikasi in-app (badge/counter) untuk reminder H-1 & overdue
+- [x] Halaman/list notifikasi in-app
 
 ## Modul Rating/Review
 - [ ] Form beri rating (1-5) + komentar, muncul hanya untuk booking COMPLETED

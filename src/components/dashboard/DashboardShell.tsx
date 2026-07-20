@@ -14,8 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ReminderBell } from "@/components/reminders/ReminderBell";
 import { cn } from "@/lib/utils";
 import { DASHBOARD_NAV } from "@/lib/dashboard/nav-config";
+import { getRemindersForOwner, getRemindersForRenter } from "@/lib/mock/reminders";
 import { ROLE_LABEL, type MockUser } from "@/lib/mock/session";
 
 interface DashboardShellProps {
@@ -44,6 +46,15 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
   const profileHref = navItems.find((item) => item.label === "Profil")?.href ?? "#";
 
+  // Reminders (H-1 / overdue) only apply to Owner and Renter roles — Admin
+  // has no bookings of its own to be reminded about, per docs/prd.md.
+  const reminders =
+    user.role === "OWNER"
+      ? getRemindersForOwner(user.id)
+      : user.role === "RENTER"
+        ? getRemindersForRenter(user.id)
+        : [];
+
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-muted/40">
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-background px-4 sm:px-6">
@@ -55,6 +66,9 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         </Badge>
 
         <div className="ml-auto flex items-center gap-2">
+          {(user.role === "OWNER" || user.role === "RENTER") && (
+            <ReminderBell reminders={reminders} role={user.role} />
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <span className="flex size-7 items-center justify-center rounded-full bg-secondary text-secondary-foreground">

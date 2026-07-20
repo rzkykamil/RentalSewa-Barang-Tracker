@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  Bell,
   ClipboardList,
   History,
   LayoutDashboard,
@@ -35,6 +36,7 @@ export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
     { label: "Barang Saya", href: "/owner/items", icon: PackageSearch },
     { label: "Request Masuk", href: "/owner/bookings", icon: ClipboardList },
     { label: "Riwayat Transaksi", href: "/owner/history", icon: History },
+    { label: "Notifikasi", href: "/owner/notifications", icon: Bell },
     { label: "Profil", href: "/owner/profile", icon: User },
   ],
   RENTER: [
@@ -42,6 +44,7 @@ export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
     { label: "Jelajah Barang", href: "/renter/browse", icon: PackageSearch },
     { label: "Booking Saya", href: "/renter/bookings", icon: ClipboardList },
     { label: "Riwayat & Review", href: "/renter/history", icon: Star },
+    { label: "Notifikasi", href: "/renter/notifications", icon: Bell },
     { label: "Profil", href: "/renter/profile", icon: User },
   ],
   ADMIN: [
