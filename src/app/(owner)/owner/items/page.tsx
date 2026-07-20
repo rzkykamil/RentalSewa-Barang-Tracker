@@ -65,7 +65,9 @@ export default function OwnerItemsPage() {
                 {ownerItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="max-w-56 truncate font-medium text-foreground">
-                      {item.name}
+                      <Link href={`/owner/items/${item.id}`} className="hover:underline">
+                        {item.name}
+                      </Link>
                       <span className="block text-xs font-normal text-muted-foreground sm:hidden">
                         {item.category} &middot; {itemConditionLabel[item.condition]}
                       </span>

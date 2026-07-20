@@ -28,8 +28,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Tampilkan status pembayaran di detail booking (Owner & Renter)
 
 ## Modul History
-- [ ] Halaman riwayat transaksi per user (filter status, urut tanggal)
-- [ ] Halaman riwayat transaksi per barang (dilihat dari detail barang, khusus Owner)
+- [x] Halaman riwayat transaksi per user (filter status, urut tanggal)
+- [x] Halaman riwayat transaksi per barang (dilihat dari detail barang, khusus Owner)
 
 ## Modul Reminder
 - [ ] Komponen notifikasi in-app (badge/counter) untuk reminder H-1 & overdue

@@ -108,6 +108,17 @@ export const browseCopy = {
   perDay: "/hari",
 } as const;
 
+export const ownerItemDetailCopy = {
+  perDay: "/hari",
+  conditionLabel: "Kondisi",
+  categoryLabel: "Kategori",
+  descriptionTitle: "Deskripsi",
+  editButton: "Edit Barang",
+  backToItems: "Kembali ke Barang Saya",
+  notFoundTitle: "Barang tidak ditemukan",
+  notFoundDescription: "Barang yang Anda cari mungkin sudah dihapus atau bukan milik Anda.",
+} as const;
+
 export const itemDetailCopy = {
   perDay: "/hari",
   conditionLabel: "Kondisi",
