@@ -27,8 +27,9 @@ export interface DashboardNavItem {
 
 /**
  * Nav structure per role, following the permission matrix in
- * docs/prd.md §7. Only "Dashboard" and "Profil" are wired to real pages
- * in this phase — the rest are placeholders for upcoming modules.
+ * docs/prd.md §7. All items are wired to real pages now that every module
+ * (Auth–Review, Admin) has a frontend implementation; `comingSoon` remains
+ * available on `DashboardNavItem` for any future module still in progress.
  */
 export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
   OWNER: [
@@ -49,9 +50,9 @@ export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
   ],
   ADMIN: [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Kelola User", href: "/admin/users", icon: Users, comingSoon: true },
-    { label: "Kelola Barang", href: "/admin/items", icon: PackageSearch, comingSoon: true },
-    { label: "Kelola Booking", href: "/admin/bookings", icon: ShieldCheck, comingSoon: true },
+    { label: "Kelola User", href: "/admin/users", icon: Users },
+    { label: "Kelola Barang", href: "/admin/items", icon: PackageSearch },
+    { label: "Kelola Booking", href: "/admin/bookings", icon: ShieldCheck },
     { label: "Profil", href: "/admin/profile", icon: User },
   ],
 };

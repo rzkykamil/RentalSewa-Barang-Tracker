@@ -46,7 +46,7 @@ export interface MockItem {
  * MockUser records — since only one owner account is "logged in" in this
  * phase.
  */
-const OTHER_OWNERS = [
+export const OTHER_OWNERS = [
   { id: "mock-owner-2", name: "Dewi Lestari" },
   { id: "mock-owner-3", name: "Agus Wijaya" },
 ];
