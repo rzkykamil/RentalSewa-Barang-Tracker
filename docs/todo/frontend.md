@@ -40,14 +40,14 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Tampilkan daftar review & rata-rata rating di halaman detail barang
 
 ## Modul Admin
-- [ ] Halaman daftar seluruh user + aksi nonaktifkan
-- [ ] Halaman daftar seluruh barang + aksi nonaktifkan paksa
-- [ ] Halaman daftar seluruh booking (read-only monitoring)
+- [x] Halaman daftar seluruh user + aksi nonaktifkan
+- [x] Halaman daftar seluruh barang + aksi nonaktifkan paksa
+- [x] Halaman daftar seluruh booking (read-only monitoring)
 
 ## Cross-cutting
-- [ ] Setup design tokens (warna, spacing, tipografi) sesuai `docs/design-system.md`
-- [ ] Komponen shared: `ItemCard`, `BookingStatusBadge`, `RatingStars`, `EmptyState`, `ConfirmDialog`
-- [ ] Responsive check (mobile/tablet/desktop) untuk seluruh halaman utama
+- [x] Setup design tokens (warna, spacing, tipografi) sesuai `docs/design-system.md`
+- [x] Komponen shared: `ItemCard`, `BookingStatusBadge`, `RatingStars`, `EmptyState`, `ConfirmDialog`
+- [x] Responsive check (mobile/tablet/desktop) untuk seluruh halaman utama
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
