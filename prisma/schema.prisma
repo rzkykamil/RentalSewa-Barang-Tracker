@@ -11,3 +11,24 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRole {
+  OWNER
+  RENTER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(120)
+  email        String   @unique @db.VarChar(160)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         UserRole
+  phone        String?  @db.VarChar(30)
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(255)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("users")
+}
