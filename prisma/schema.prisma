@@ -30,7 +30,8 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  items Item[]
+  items            Item[]
+  bookingsAsRenter Booking[]
 
   @@map("users")
 }
@@ -60,8 +61,9 @@ model Item {
   createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
-  owner  User        @relation(fields: [ownerId], references: [id])
-  photos ItemPhoto[]
+  owner    User        @relation(fields: [ownerId], references: [id])
+  photos   ItemPhoto[]
+  bookings Booking[]
 
   @@index([ownerId])
   @@index([category])
@@ -80,4 +82,37 @@ model ItemPhoto {
 
   @@index([itemId])
   @@map("item_photos")
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  COMPLETED
+  LATE
+}
+
+model Booking {
+  id          String        @id @default(uuid()) @db.Uuid
+  itemId      String        @map("item_id") @db.Uuid
+  renterId    String        @map("renter_id") @db.Uuid
+  startDate   DateTime      @map("start_date") @db.Date
+  endDate     DateTime      @map("end_date") @db.Date
+  status      BookingStatus @default(PENDING)
+  totalPrice  Decimal       @map("total_price") @db.Decimal(12, 2)
+  notes       String?
+  requestedAt DateTime      @default(now()) @map("requested_at") @db.Timestamptz
+  approvedAt  DateTime?     @map("approved_at") @db.Timestamptz
+  rejectedAt  DateTime?     @map("rejected_at") @db.Timestamptz
+  activatedAt DateTime?     @map("activated_at") @db.Timestamptz
+  completedAt DateTime?     @map("completed_at") @db.Timestamptz
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  item   Item @relation(fields: [itemId], references: [id])
+  renter User @relation(fields: [renterId], references: [id])
+
+  @@index([itemId, status])
+  @@index([renterId])
+  @@map("bookings")
 }

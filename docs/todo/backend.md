@@ -21,12 +21,12 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Handler upload foto ke filesystem lokal (validasi tipe & ukuran file)
 
 ## Modul Booking
-- [ ] Prisma schema `Booking` + migration + index komposit `(item_id, status)`
-- [ ] Endpoint `POST /api/v1/bookings` (validasi tanggal, hitung total_price sesuai BR2)
-- [ ] Endpoint `PATCH /api/v1/bookings/:id/approve` (implementasi BR1: lock item + auto-reject request lain, dalam transaction Prisma)
-- [ ] Endpoint `PATCH /api/v1/bookings/:id/reject`
-- [ ] Endpoint `PATCH /api/v1/bookings/:id/activate`
-- [ ] Endpoint `PATCH /api/v1/bookings/:id/complete` (kembalikan item ke TERSEDIA)
+- [x] Prisma schema `Booking` + migration + index komposit `(item_id, status)`
+- [x] Endpoint `POST /api/v1/bookings` (validasi tanggal, hitung total_price sesuai BR2)
+- [x] Endpoint `PATCH /api/v1/bookings/:id/approve` (implementasi BR1: lock item + auto-reject request lain, dalam transaction Prisma)
+- [x] Endpoint `PATCH /api/v1/bookings/:id/reject`
+- [x] Endpoint `PATCH /api/v1/bookings/:id/activate`
+- [x] Endpoint `PATCH /api/v1/bookings/:id/complete` (kembalikan item ke TERSEDIA)
 - [ ] Unit test business rules BR1–BR2 di service layer
 
 ## Modul Payment Tracking
@@ -64,5 +64,4 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
 
-- **`bookings.activated_at` kolom belum ada di `docs/database-design.md`:** endpoint `PATCH /api/v1/bookings/:id/activate` sudah direncanakan di atas, tapi tabel `bookings` di `docs/database-design.md` §2 hanya punya `approved_at / rejected_at / completed_at` — tidak ada timestamp khusus transisi APPROVED → ACTIVE. Ditemukan saat mengerjakan frontend Modul Booking (mock data `src/lib/mock/bookings.ts` menambahkan field `activatedAt` supaya timeline UI PENDING → APPROVED → ACTIVE → COMPLETED punya sumber data konsisten). Perlu ditambahkan ke skema saat migrasi Modul Booking dikerjakan.
 - **Belum ada endpoint frontend-facing untuk notifikasi in-app:** `docs/api-spec.md` §Reminder hanya mendefinisikan `POST /internal/reminders/run` (server-only, dipicu scheduled job) — tidak ada endpoint `GET` yang bisa dipanggil dashboard Owner/Renter untuk mengambil daftar reminder in-app (badge/counter & halaman Notifikasi). Ditemukan saat mengerjakan frontend Modul Reminder (`src/lib/mock/reminders.ts` menurunkan reminder H-1/overdue langsung dari `MOCK_BOOKINGS` di client, bukan dari `ReminderLog`). Perlu ditambahkan mis. `GET /api/v1/reminders/me` (scoped ke user login, gabungan sebagai Owner & Renter) saat migrasi Modul Reminder backend dikerjakan — sekalian dipertimbangkan apakah butuh state "sudah dibaca" (`reminder_logs` saat ini tidak punya kolom tsb).

@@ -1,0 +1,11 @@
+$kind: http-request
+name: Activate Booking
+method: PATCH
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/activate"
+description: >-
+  Owner (pemilik barang pada booking tsb) only — menandai barang sudah
+  diserahterimakan ke Renter, booking `APPROVED` → `ACTIVE`. Balas 401
+  UNAUTHENTICATED kalau belum login, 404 NOT_FOUND kalau booking tidak
+  ada, 403 FORBIDDEN kalau bukan pemilik barang, 422
+  BUSINESS_RULE_VIOLATION kalau booking belum berstatus `APPROVED`.
+order: 3500

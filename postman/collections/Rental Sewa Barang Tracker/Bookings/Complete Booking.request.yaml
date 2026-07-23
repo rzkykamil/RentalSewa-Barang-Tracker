@@ -1,0 +1,12 @@
+$kind: http-request
+name: Complete Booking
+method: PATCH
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/complete"
+description: >-
+  Owner (pemilik barang pada booking tsb) only — menandai barang sudah
+  dikembalikan, booking `ACTIVE`/`LATE` → `COMPLETED`, item terkait →
+  kembali `TERSEDIA` (satu transaksi `prisma.$transaction`). Balas 401
+  UNAUTHENTICATED kalau belum login, 404 NOT_FOUND kalau booking tidak
+  ada, 403 FORBIDDEN kalau bukan pemilik barang, 422
+  BUSINESS_RULE_VIOLATION kalau booking bukan berstatus `ACTIVE`/`LATE`.
+order: 4000

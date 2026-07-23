@@ -1,0 +1,10 @@
+$kind: http-request
+name: Get Booking Detail
+method: GET
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}"
+description: >-
+  Login wajib. Bisa diakses Renter pemilik booking, Owner barang terkait,
+  atau Admin. Balas 401 UNAUTHENTICATED kalau belum login, 404 NOT_FOUND
+  kalau booking tidak ada, 403 FORBIDDEN kalau login tapi bukan
+  pihak terkait booking tsb.
+order: 1500

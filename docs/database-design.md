@@ -60,6 +60,7 @@ erDiagram
         string notes
         datetime requested_at
         datetime approved_at
+        datetime activated_at
         datetime rejected_at
         datetime completed_at
         datetime updated_at
@@ -143,7 +144,9 @@ erDiagram
 | total_price | numeric(12,2) | not null |
 | notes | text | nullable |
 | requested_at | timestamptz | default now() |
-| approved_at / rejected_at / completed_at | timestamptz | nullable |
+| approved_at / rejected_at | timestamptz | nullable |
+| activated_at | timestamptz | nullable |
+| completed_at | timestamptz | nullable |
 | updated_at | timestamptz | auto-update |
 
 Index komposit: `(item_id, status)` — dipakai untuk cek cepat apakah ada booking `PENDING`/`APPROVED`/`ACTIVE` lain saat validasi BR1.

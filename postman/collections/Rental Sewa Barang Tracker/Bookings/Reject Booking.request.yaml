@@ -1,0 +1,12 @@
+$kind: http-request
+name: Reject Booking
+method: PATCH
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/reject"
+description: >-
+  Owner (pemilik barang pada booking tsb) only — menolak request sewa yang
+  masih `PENDING` → status `REJECTED`. Status item tidak diubah (item
+  tetap `TERSEDIA`, belum pernah di-approve). Balas 401 UNAUTHENTICATED
+  kalau belum login, 404 NOT_FOUND kalau booking tidak ada, 403 FORBIDDEN
+  kalau bukan pemilik barang, 422 BUSINESS_RULE_VIOLATION kalau booking
+  sudah tidak berstatus `PENDING`.
+order: 3000

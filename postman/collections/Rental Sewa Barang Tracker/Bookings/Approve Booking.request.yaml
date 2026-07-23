@@ -1,0 +1,13 @@
+$kind: http-request
+name: Approve Booking
+method: PATCH
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/approve"
+description: >-
+  Owner (pemilik barang pada booking tsb) only — implementasi BR1: booking
+  ini → `APPROVED`, item terkait → `DISEWA`, dan seluruh booking `PENDING`
+  lain untuk item yang sama otomatis → `REJECTED` (satu transaksi
+  `prisma.$transaction`). Balas 401 UNAUTHENTICATED kalau belum login, 404
+  NOT_FOUND kalau booking tidak ada, 403 FORBIDDEN kalau bukan pemilik
+  barang, 422 BUSINESS_RULE_VIOLATION kalau booking sudah tidak berstatus
+  `PENDING` (sudah pernah diproses).
+order: 2500

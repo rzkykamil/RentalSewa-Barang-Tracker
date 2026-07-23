@@ -20,3 +20,5 @@ values:
     value: Outdoor
   - key: itemId
     value: ''
+  - key: bookingId
+    value: ''

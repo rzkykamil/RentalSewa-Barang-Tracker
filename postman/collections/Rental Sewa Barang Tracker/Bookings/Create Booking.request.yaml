@@ -1,0 +1,25 @@
+$kind: http-request
+name: Create Booking
+method: POST
+url: "{{baseUrl}}api/v1/bookings"
+description: >-
+  Renter only — mengajukan request sewa. Balas 401 UNAUTHENTICATED kalau
+  belum login, 403 FORBIDDEN kalau login tapi bukan RENTER. Body JSON:
+  `itemId`, `startDate`/`endDate` (`YYYY-MM-DD`, `endDate >= startDate`,
+  `startDate` tidak boleh di masa lalu), `notes` (opsional). Balas 404
+  NOT_FOUND kalau item tidak ada, 409 CONFLICT kalau item sedang tidak
+  `TERSEDIA`. `totalPrice` dihitung otomatis di server: `pricePerDay ×
+  jumlah hari` (inklusif kedua tanggal, BR2). Booking dibuat dengan status
+  `PENDING`.
+order: 2000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "itemId": "{{itemId}}",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-03",
+      "notes": "Dipakai untuk acara kemah keluarga."
+    }

@@ -1,0 +1,15 @@
+$kind: http-request
+name: List Bookings
+method: GET
+url: "{{baseUrl}}api/v1/bookings?page=1&limit=20"
+description: >-
+  Login wajib (Renter/Owner). Renter melihat booking miliknya sendiri
+  (`renterId = session.user.id`); Owner melihat booking untuk barang
+  miliknya (join via `Item.ownerId`). Admin ditolak 403 FORBIDDEN — admin
+  punya endpoint terpisah. Filter opsional `status` (salah satu
+  `PENDING`/`APPROVED`/`REJECTED`/`ACTIVE`/`COMPLETED`/`LATE`), pagination
+  `page`/`limit` (max 100). Balas 401 UNAUTHENTICATED kalau belum login.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 1000
