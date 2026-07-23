@@ -14,11 +14,11 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Rate limiting endpoint login/register
 
 ## Modul Barang (Item)
-- [ ] Prisma schema `Item` + `ItemPhoto` + migration
-- [ ] Endpoint `POST/PATCH/DELETE /api/v1/items` (validasi ownership)
-- [ ] Endpoint `GET /api/v1/items` (filter kategori/harga/status, pagination)
-- [ ] Endpoint `GET /api/v1/items/:id` (include foto + rating rata-rata)
-- [ ] Handler upload foto ke filesystem lokal (validasi tipe & ukuran file)
+- [x] Prisma schema `Item` + `ItemPhoto` + migration
+- [x] Endpoint `POST/PATCH/DELETE /api/v1/items` (validasi ownership)
+- [x] Endpoint `GET /api/v1/items` (filter kategori/harga/status, pagination)
+- [x] Endpoint `GET /api/v1/items/:id` (include foto + rating rata-rata)
+- [x] Handler upload foto ke filesystem lokal (validasi tipe & ukuran file)
 
 ## Modul Booking
 - [ ] Prisma schema `Booking` + migration + index komposit `(item_id, status)`

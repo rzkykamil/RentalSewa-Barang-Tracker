@@ -1,0 +1,10 @@
+$kind: http-request
+name: Deactivate Item
+method: DELETE
+url: "{{baseUrl}}api/v1/items/{{itemId}}"
+description: >-
+  Owner (pemilik barang) only — soft delete: mengubah `status` barang jadi
+  `NONAKTIF`, bukan menghapus row (docs/database-design.md §6). Balas 404
+  NOT_FOUND kalau barang tidak ada, 403 FORBIDDEN kalau login tapi bukan
+  pemilik barang tsb.
+order: 3000

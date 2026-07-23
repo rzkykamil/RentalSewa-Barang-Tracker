@@ -1,0 +1,20 @@
+$kind: http-request
+name: Update Item
+method: PATCH
+url: "{{baseUrl}}api/v1/items/{{itemId}}"
+description: >-
+  Owner (pemilik barang) only — update barang milik sendiri, minimal satu
+  field (`name`/`description`/`category`/`condition`/`pricePerDay`). Photo
+  add/remove tidak didukung lewat endpoint ini (hanya `POST /items` yang
+  menerima upload foto). Balas 404 NOT_FOUND kalau barang tidak ada, 403
+  FORBIDDEN kalau login tapi bukan pemilik barang tsb.
+order: 2500
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "pricePerDay": 60000,
+      "condition": "CUKUP"
+    }

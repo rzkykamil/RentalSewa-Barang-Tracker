@@ -1,0 +1,35 @@
+$kind: http-request
+name: Create Item
+method: POST
+url: "{{baseUrl}}api/v1/items"
+description: >-
+  Owner only — butuh session cookie hasil login sebagai user role OWNER
+  (lihat folder Auth: Get CSRF Token -> Login). Balas 401 UNAUTHENTICATED
+  kalau belum login, 403 FORBIDDEN kalau login tapi bukan OWNER. Body
+  `multipart/form-data`: `name`, `description`, `category`, `condition`
+  (`BAIK`/`CUKUP`/`RUSAK_RINGAN`), `pricePerDay`, dan field file berulang
+  `photos` (maks 8 foto). Foto divalidasi tipe (jpg/jpeg/png/webp) dan ukuran
+  (maks 5MB/file) sebelum ditulis ke `uploads/items/<itemId>/` di
+  filesystem lokal server.
+order: 2000
+body:
+  type: formdata
+  content:
+    - key: name
+      value: Tenda Camping 4 Orang
+      type: text
+    - key: description
+      value: Tenda dome kapasitas 4 orang, lengkap dengan flysheet.
+      type: text
+    - key: category
+      value: Outdoor
+      type: text
+    - key: condition
+      value: BAIK
+      type: text
+    - key: pricePerDay
+      value: "50000"
+      type: text
+    - key: photos
+      type: file
+      src: []

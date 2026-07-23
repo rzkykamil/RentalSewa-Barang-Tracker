@@ -30,5 +30,54 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
+  items Item[]
+
   @@map("users")
+}
+
+enum ItemCondition {
+  BAIK
+  CUKUP
+  RUSAK_RINGAN
+}
+
+enum ItemStatus {
+  TERSEDIA
+  DISEWA
+  TELAT_KEMBALI
+  NONAKTIF
+}
+
+model Item {
+  id           String        @id @default(uuid()) @db.Uuid
+  ownerId      String        @map("owner_id") @db.Uuid
+  name         String        @db.VarChar(160)
+  description  String?
+  category     String        @db.VarChar(80)
+  condition    ItemCondition
+  pricePerDay  Decimal       @map("price_per_day") @db.Decimal(12, 2)
+  status       ItemStatus    @default(TERSEDIA)
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  owner  User        @relation(fields: [ownerId], references: [id])
+  photos ItemPhoto[]
+
+  @@index([ownerId])
+  @@index([category])
+  @@index([status])
+  @@map("items")
+}
+
+model ItemPhoto {
+  id        String  @id @default(uuid()) @db.Uuid
+  itemId    String  @map("item_id") @db.Uuid
+  url       String  @db.VarChar(255)
+  isPrimary Boolean @default(false) @map("is_primary")
+  sortOrder Int     @default(0) @map("sort_order")
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@map("item_photos")
 }

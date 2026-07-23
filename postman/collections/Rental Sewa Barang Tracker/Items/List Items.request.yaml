@@ -1,0 +1,12 @@
+$kind: http-request
+name: List Items
+method: GET
+url: "{{baseUrl}}api/v1/items?category={{itemCategory}}&status=TERSEDIA&page=1&limit=20&sort=price_asc"
+description: Public. List barang dengan filter `category`, `status` (default `TERSEDIA` kalau param dihilangkan), `minPrice`/`maxPrice`, `sort` (`price_asc` / `price_desc`), dan pagination `page`/`limit` (max 100). Tidak butuh login.
+queryParams:
+  category: "{{itemCategory}}"
+  status: TERSEDIA
+  page: "1"
+  limit: "20"
+  sort: price_asc
+order: 1000

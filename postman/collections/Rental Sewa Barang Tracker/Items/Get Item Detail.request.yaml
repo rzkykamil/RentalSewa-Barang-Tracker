@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Item Detail
+method: GET
+url: "{{baseUrl}}api/v1/items/{{itemId}}"
+description: >-
+  Public. Detail barang beserta foto. `ratingAverage` sengaja selalu `null`
+  untuk saat ini — belum ada model `Booking`/`Review` (lihat
+  docs/todo/backend.md Backlog). Balas 404 NOT_FOUND kalau id tidak ada.
+order: 1500

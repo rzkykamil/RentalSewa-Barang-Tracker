@@ -12,3 +12,11 @@ values:
     value: renter.baru@example.com
   - key: registerPassword
     value: password123
+  - key: ownerEmail
+    value: owner@example.com
+  - key: ownerPassword
+    value: password123
+  - key: itemCategory
+    value: Outdoor
+  - key: itemId
+    value: ''
