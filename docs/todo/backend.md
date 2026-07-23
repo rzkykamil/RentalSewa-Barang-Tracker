@@ -9,9 +9,9 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Seed data awal (admin, owner, renter contoh) — perlu dijalankan manual (`npm run db:seed`) oleh user, belum dieksekusi otomatis
 
 ## Modul Auth
-- [ ] Endpoint `POST /api/v1/auth/register` (hash password, validasi role)
-- [ ] Endpoint `GET/PATCH /api/v1/auth/me`
-- [ ] Rate limiting endpoint login/register
+- [x] Endpoint `POST /api/v1/auth/register` (hash password, validasi role)
+- [x] Endpoint `GET/PATCH /api/v1/auth/me`
+- [x] Rate limiting endpoint login/register
 
 ## Modul Barang (Item)
 - [ ] Prisma schema `Item` + `ItemPhoto` + migration

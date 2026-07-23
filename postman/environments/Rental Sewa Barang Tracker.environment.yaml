@@ -1,0 +1,14 @@
+name: Rental Sewa Barang Tracker
+values:
+  - key: baseUrl
+    value: 'http://localhost:3000/'
+  - key: csrfToken
+    value: ''
+  - key: email
+    value: renter@example.com
+  - key: password
+    value: password123
+  - key: registerEmail
+    value: renter.baru@example.com
+  - key: registerPassword
+    value: password123

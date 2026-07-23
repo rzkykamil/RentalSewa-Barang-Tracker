@@ -28,6 +28,7 @@
 | 404 | `NOT_FOUND` |
 | 409 | `CONFLICT` — misal barang sudah tidak `TERSEDIA` saat request diajukan (BR1) |
 | 422 | `BUSINESS_RULE_VIOLATION` — melanggar business rule (misal review untuk booking belum `COMPLETED`) |
+| 429 | `RATE_LIMITED` — terlalu banyak percobaan dalam jangka waktu tertentu (mis. login/register, lihat `docs/technical-spec.md` §6) |
 | 500 | `INTERNAL_ERROR` |
 
 ## 3. Endpoint per Modul

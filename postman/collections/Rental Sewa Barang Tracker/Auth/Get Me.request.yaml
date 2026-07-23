@@ -1,0 +1,8 @@
+$kind: http-request
+name: Get Me
+method: GET
+url: "{{baseUrl}}api/v1/auth/me"
+description: >-
+  Profil user yang sedang login. Butuh session cookie aktif (lihat Login) —
+  balas 401 UNAUTHENTICATED kalau belum login.
+order: 3000

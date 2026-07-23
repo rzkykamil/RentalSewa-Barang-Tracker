@@ -1,0 +1,18 @@
+$kind: http-request
+name: Logout (NextAuth)
+method: POST
+url: "{{baseUrl}}api/auth/signout"
+description: >-
+  Logout — hapus session cookie. Butuh {{csrfToken}} yang masih valid,
+  jalankan **Get CSRF Token** lagi dulu kalau sudah lama sejak login
+  (csrfToken di-scope per session cookie).
+order: 2500
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    - key: csrfToken
+      value: "{{csrfToken}}"
+    - key: json
+      value: "true"

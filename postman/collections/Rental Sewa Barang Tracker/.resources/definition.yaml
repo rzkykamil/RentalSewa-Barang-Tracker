@@ -1,0 +1,18 @@
+$kind: collection
+name: Rental Sewa Barang Tracker
+description: |-
+  API collection untuk Rental Sewa Barang Tracker, mengikuti kontrak di `docs/api-spec.md`.
+
+  ## Response Envelope
+  - Sukses: `{ "data": ..., "meta"?: {...} }`
+  - Error: `{ "error": { "code", "message", "details"? } }`
+
+  ## Authentication
+  Auth pakai session cookie NextAuth (credentials provider, JWT strategy) — bukan Bearer token.
+  1. **Auth / Get CSRF Token** untuk ambil `csrfToken` (disimpan otomatis ke environment) + cookie CSRF.
+  2. **Auth / Login (NextAuth Credentials)** — kirim `csrfToken` + email/password, cookie session (`next-auth.session-token`) otomatis tersimpan oleh Postman cookie jar untuk request berikutnya.
+  3. **Auth / Logout (NextAuth)** untuk menghapus sesi (butuh csrfToken juga).
+
+  Endpoint di bawah `/api/v1/**` (Get Me, Update Me, Register) hanya butuh cookie sesi aktif — tidak perlu header tambahan, asal cookie jar Postman aktif untuk environment ini.
+
+  Hanya modul yang sudah diimplementasikan yang dimasukkan di sini (lihat `docs/todo/backend.md`) — modul lain (Items, Bookings, dst.) menyusul saat backend-nya dikerjakan.

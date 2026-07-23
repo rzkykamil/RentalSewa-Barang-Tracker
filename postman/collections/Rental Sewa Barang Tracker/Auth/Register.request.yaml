@@ -1,0 +1,21 @@
+$kind: http-request
+name: Register
+method: POST
+url: "{{baseUrl}}api/v1/auth/register"
+description: >-
+  Registrasi user baru sebagai Owner atau Renter (role ADMIN tidak bisa
+  dipilih lewat endpoint ini). Rate limited ~5/menit per IP. Password minimal
+  8 karakter, di-hash bcrypt di server.
+order: 1000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Renter Contoh",
+      "email": "{{registerEmail}}",
+      "password": "{{registerPassword}}",
+      "role": "RENTER",
+      "phone": "081234567890"
+    }

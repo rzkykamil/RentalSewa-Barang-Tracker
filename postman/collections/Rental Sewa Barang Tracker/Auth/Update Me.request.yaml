@@ -1,0 +1,17 @@
+$kind: http-request
+name: Update Me
+method: PATCH
+url: "{{baseUrl}}api/v1/auth/me"
+description: >-
+  Update profil user yang sedang login (name/phone/avatarUrl — minimal satu
+  field). Email/role/password tidak bisa diubah lewat endpoint ini.
+order: 3500
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Renter Contoh (Updated)",
+      "phone": "089876543210"
+    }

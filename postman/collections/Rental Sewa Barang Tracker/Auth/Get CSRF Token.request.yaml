@@ -1,0 +1,15 @@
+$kind: http-request
+name: Get CSRF Token
+method: GET
+url: "{{baseUrl}}api/auth/csrf"
+description: >-
+  Wajib dipanggil sebelum Login/Logout — NextAuth mewajibkan csrfToken yang
+  valid (dipasangkan dengan cookie CSRF yang di-set di response ini) untuk
+  menerima POST ke /callback/credentials atau /signout.
+scripts:
+  - type: afterResponse
+    code: |
+      const res = pm.response.json();
+      if (res?.csrfToken) pm.environment.set('csrfToken', res.csrfToken);
+    language: text/javascript
+order: 1500
