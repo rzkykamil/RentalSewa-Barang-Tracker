@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { OwnerBookingsList } from "@/components/bookings/OwnerBookingsList";
 import { ownerBookingsCopy } from "@/lib/copy/bookings";
 import { getBookingsByOwner } from "@/lib/mock/bookings";
@@ -21,12 +21,10 @@ export default function OwnerBookingsPage() {
       </div>
 
       {bookings.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="font-medium text-foreground">{ownerBookingsCopy.empty.title}</p>
-            <p className="text-sm text-muted-foreground">{ownerBookingsCopy.empty.description}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title={ownerBookingsCopy.empty.title}
+          description={ownerBookingsCopy.empty.description}
+        />
       ) : (
         <OwnerBookingsList initialBookings={bookings} />
       )}

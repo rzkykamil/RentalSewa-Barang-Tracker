@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { itemConditionLabel, itemListCopy } from "@/lib/copy/items";
 import { MOCK_ITEMS } from "@/lib/mock/items";
@@ -37,15 +38,15 @@ export default function OwnerItemsPage() {
       </div>
 
       {ownerItems.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="font-medium text-foreground">{itemListCopy.empty.title}</p>
-            <p className="text-sm text-muted-foreground">{itemListCopy.empty.description}</p>
-            <Button asChild className="mt-2">
+        <EmptyState
+          title={itemListCopy.empty.title}
+          description={itemListCopy.empty.description}
+          action={
+            <Button asChild>
               <Link href="/owner/items/new">{itemListCopy.addNew}</Link>
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <Card>
           <CardContent className="p-0">

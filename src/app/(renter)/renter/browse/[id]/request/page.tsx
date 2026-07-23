@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { BookingRequestForm } from "@/components/bookings/BookingRequestForm";
 import { bookingRequestFormCopy } from "@/lib/copy/bookings";
 import { itemDetailCopy } from "@/lib/copy/items";
@@ -22,15 +22,15 @@ export default async function BookingRequestPage({ params }: BookingRequestPageP
 
   if (!item) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-          <p className="font-medium text-foreground">{itemDetailCopy.notFoundTitle}</p>
-          <p className="text-sm text-muted-foreground">{itemDetailCopy.notFoundDescription}</p>
+      <EmptyState
+        title={itemDetailCopy.notFoundTitle}
+        description={itemDetailCopy.notFoundDescription}
+        action={
           <Button asChild variant="outline">
             <Link href="/renter/browse">{itemDetailCopy.backToBrowse}</Link>
           </Button>
-        </CardContent>
-      </Card>
+        }
+      />
     );
   }
 

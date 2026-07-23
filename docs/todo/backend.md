@@ -3,10 +3,10 @@
 Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan mengikuti jadwal fokus di `docs/development-workflow.md`.
 
 ## Foundation
-- [ ] Setup Prisma schema awal (`User` enum role) sesuai `docs/database-design.md`
-- [ ] Setup NextAuth credentials provider + JWT session strategy
-- [ ] Middleware role guard (`middleware.ts`) sesuai `docs/flows/auth-permission-flow.md`
-- [ ] Seed data awal (admin, owner, renter contoh)
+- [x] Setup Prisma schema awal (`User` enum role) sesuai `docs/database-design.md`
+- [x] Setup NextAuth credentials provider + JWT session strategy
+- [x] Middleware role guard (`middleware.ts`) sesuai `docs/flows/auth-permission-flow.md`
+- [x] Seed data awal (admin, owner, renter contoh) — perlu dijalankan manual (`npm run db:seed`) oleh user, belum dieksekusi otomatis
 
 ## Modul Auth
 - [ ] Endpoint `POST /api/v1/auth/register` (hash password, validasi role)

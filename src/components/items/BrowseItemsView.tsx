@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FormField } from "@/components/auth/FormField";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { ItemCard } from "@/components/items/ItemCard";
 import { browseCopy } from "@/lib/copy/items";
 import type { MockItem } from "@/lib/mock/items";
@@ -117,12 +118,7 @@ export function BrowseItemsView({
       </Card>
 
       {filteredItems.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="font-medium text-foreground">{browseCopy.empty.title}</p>
-            <p className="text-sm text-muted-foreground">{browseCopy.empty.description}</p>
-          </CardContent>
-        </Card>
+        <EmptyState title={browseCopy.empty.title} description={browseCopy.empty.description} />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredItems.map((item) => (

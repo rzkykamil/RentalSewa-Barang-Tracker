@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { ItemPhotoGallery } from "@/components/items/ItemPhotoGallery";
 import { RatingStars } from "@/components/items/RatingStars";
@@ -29,15 +30,15 @@ export default async function ItemDetailPage({ params }: ItemDetailPageProps) {
 
   if (!item) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-          <p className="font-medium text-foreground">{itemDetailCopy.notFoundTitle}</p>
-          <p className="text-sm text-muted-foreground">{itemDetailCopy.notFoundDescription}</p>
+      <EmptyState
+        title={itemDetailCopy.notFoundTitle}
+        description={itemDetailCopy.notFoundDescription}
+        action={
           <Button asChild variant="outline">
             <Link href="/renter/browse">{itemDetailCopy.backToBrowse}</Link>
           </Button>
-        </CardContent>
-      </Card>
+        }
+      />
     );
   }
 

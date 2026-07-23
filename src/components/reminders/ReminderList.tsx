@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { ReminderTypeBadge } from "@/components/reminders/ReminderTypeBadge";
 import { reminderListCopy } from "@/lib/copy/reminders";
 import type { MockReminder } from "@/lib/mock/reminders";
@@ -32,12 +33,7 @@ export function ReminderList({ reminders, role }: ReminderListProps) {
 
   if (reminders.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-          <p className="font-medium text-foreground">{reminderListCopy.empty.title}</p>
-          <p className="text-sm text-muted-foreground">{reminderListCopy.empty.description}</p>
-        </CardContent>
-      </Card>
+      <EmptyState title={reminderListCopy.empty.title} description={reminderListCopy.empty.description} />
     );
   }
 

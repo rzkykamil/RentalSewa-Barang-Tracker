@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ALL_USERS } from "@/lib/mock/admin";
+import { MOCK_BOOKINGS } from "@/lib/mock/bookings";
+import { MOCK_ITEMS } from "@/lib/mock/items";
 import { MOCK_USERS } from "@/lib/mock/session";
 
 export const metadata: Metadata = {
   title: "Dashboard Admin — Rental Sewa Barang Tracker",
 };
 
-const summaryCards = [
-  { label: "Total User", value: "—" },
-  { label: "Total Barang", value: "—" },
-  { label: "Total Booking", value: "—" },
-  { label: "User Nonaktif", value: "—" },
-];
-
 export default function AdminDashboardPage() {
   const user = MOCK_USERS.ADMIN;
+
+  const summaryCards = [
+    { label: "Total User", value: String(ALL_USERS.length) },
+    { label: "Total Barang", value: String(MOCK_ITEMS.length) },
+    { label: "Total Booking", value: String(MOCK_BOOKINGS.length) },
+    {
+      label: "User Nonaktif",
+      value: String(ALL_USERS.filter((candidate) => !candidate.isActive).length),
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,13 +48,6 @@ export default function AdminDashboardPage() {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-muted-foreground">
-          Modul pengawasan Admin belum tersedia — halaman ini akan
-          menampilkan data sungguhan setelah modul terkait dikerjakan.
-        </CardContent>
-      </Card>
     </div>
   );
 }

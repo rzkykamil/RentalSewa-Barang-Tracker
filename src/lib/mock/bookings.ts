@@ -46,7 +46,7 @@ export interface MockBooking {
  * not full MockUser records — since only one renter account is "logged in"
  * in this phase.
  */
-const OTHER_RENTERS = [
+export const OTHER_RENTERS = [
   { id: "mock-renter-2", name: "Rian Hidayat" },
   { id: "mock-renter-3", name: "Ayu Wulandari" },
 ];

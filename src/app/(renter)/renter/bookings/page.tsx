@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { RenterBookingCard } from "@/components/bookings/RenterBookingCard";
 import { renterBookingsCopy } from "@/lib/copy/bookings";
 import { getBookingsByRenter } from "@/lib/mock/bookings";
@@ -22,12 +22,10 @@ export default function RenterBookingsPage() {
       </div>
 
       {bookings.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="font-medium text-foreground">{renterBookingsCopy.empty.title}</p>
-            <p className="text-sm text-muted-foreground">{renterBookingsCopy.empty.description}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title={renterBookingsCopy.empty.title}
+          description={renterBookingsCopy.empty.description}
+        />
       ) : (
         <div className="flex flex-col gap-4">
           {bookings.map((booking) => (
