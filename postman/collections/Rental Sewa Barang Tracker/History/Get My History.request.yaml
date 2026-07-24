@@ -1,0 +1,17 @@
+$kind: http-request
+name: Get My History
+method: GET
+url: "{{baseUrl}}api/v1/history/me?page=1&limit=20"
+description: >-
+  Login wajib (Renter/Owner). Mengembalikan riwayat transaksi lengkap milik
+  user yang sedang login — gabungan booking sbg Renter (`renterId =
+  session.user.id`) dan sbg Owner (join via `Item.ownerId`), status apapun,
+  terurut dari yang terbaru diperbarui. Tiap item punya field `role`
+  (`RENTER`/`OWNER`) untuk membedakan konteks. Filter opsional `status`
+  (salah satu `PENDING`/`APPROVED`/`REJECTED`/`ACTIVE`/`COMPLETED`/`LATE`),
+  pagination `page`/`limit` (max 100). Balas 401 UNAUTHENTICATED kalau belum
+  login.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 1000

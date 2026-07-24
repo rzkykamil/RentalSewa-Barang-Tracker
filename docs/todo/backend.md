@@ -34,8 +34,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Endpoint `GET/PATCH /api/v1/bookings/:id/payment`
 
 ## Modul History
-- [ ] Endpoint `GET /api/v1/history/me` (gabungan booking sbg Owner & Renter, terurut tanggal)
-- [ ] Endpoint `GET /api/v1/items/:id/bookings`
+- [x] Endpoint `GET /api/v1/history/me` (gabungan booking sbg Owner & Renter, terurut tanggal)
+- [x] Endpoint `GET /api/v1/items/:id/bookings`
 
 ## Modul Reminder
 - [ ] Prisma schema `ReminderLog` + unique constraint `(booking_id, type)`

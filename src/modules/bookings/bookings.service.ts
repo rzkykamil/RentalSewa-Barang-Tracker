@@ -91,6 +91,50 @@ function toBookingDto(booking: BookingRecord): BookingDto {
   };
 }
 
+export interface HistoryBookingDto extends BookingDto {
+  role: "OWNER" | "RENTER";
+  item: {
+    id: string;
+    ownerId: string;
+    name: string;
+    category: string;
+    status: string;
+    pricePerDay: number;
+  };
+}
+
+function toHistoryBookingDto(booking: BookingWithItem, userId: string): HistoryBookingDto {
+  return {
+    ...toBookingDto(booking),
+    role: booking.renterId === userId ? "RENTER" : "OWNER",
+    item: {
+      id: booking.item.id,
+      ownerId: booking.item.ownerId,
+      name: booking.item.name,
+      category: booking.item.category,
+      status: booking.item.status,
+      pricePerDay: Number(booking.item.pricePerDay),
+    },
+  };
+}
+
+export interface ItemBookingDto extends BookingDto {
+  renter: { id: string; name: string; email: string; };
+}
+
+type BookingWithRenter = Prisma.BookingGetPayload<{ include: { renter: true } }>;
+
+function toItemBookingDto(booking: BookingWithRenter): ItemBookingDto {
+  return { ...toBookingDto(booking), renter: { id: booking.renter.id, name: booking.renter.name, email: booking.renter.email } };
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface ListBookingsFilter {
   status?: BookingStatus;
   page: number;
@@ -359,4 +403,69 @@ export async function completeBooking(bookingId: string, ownerId: string): Promi
   });
 
   return toBookingDto(completedBooking);
+}
+
+export async function listHistoryForUser(
+  userId: string,
+  filter: { status?: BookingStatus; page: number; limit: number }
+): Promise<{ bookings: HistoryBookingDto[]; pagination: PaginationMeta }> {
+  const where: Prisma.BookingWhereInput = {
+    ...(filter.status ? { status: filter.status } : {}),
+    OR: [{ renterId: userId }, { item: { ownerId: userId } }],
+  };
+
+  const [bookings, total] = await prisma.$transaction([
+    prisma.booking.findMany({
+      where,
+      include: { item: true },
+      orderBy: [{ updatedAt: "desc" }, { requestedAt: "desc" }],
+      skip: (filter.page - 1) * filter.limit,
+      take: filter.limit,
+    }),
+    prisma.booking.count({ where }),
+  ]);
+
+  return {
+    bookings: bookings.map((booking) => toHistoryBookingDto(booking, userId)),
+    pagination: {
+      page: filter.page,
+      limit: filter.limit,
+      total,
+      totalPages: Math.max(Math.ceil(total / filter.limit), 1),
+    },
+  };
+}
+
+export async function listBookingsForItem(
+  itemId: string,
+  userId: string,
+  role: "OWNER" | "ADMIN",
+  filter: { status?: BookingStatus; page: number; limit: number }
+): Promise<{ bookings: ItemBookingDto[]; pagination: PaginationMeta }> {
+  const item = await prisma.item.findUnique({ where: { id: itemId } });
+  if (!item) throw new ItemNotFoundError(itemId);
+  if (role !== "ADMIN" && item.ownerId !== userId) throw new BookingAccessError(itemId);
+
+  const where: Prisma.BookingWhereInput = { itemId, ...(filter.status ? { status: filter.status } : {}) };
+
+  const [bookings, total] = await prisma.$transaction([
+    prisma.booking.findMany({
+      where,
+      include: { renter: true },
+      orderBy: [{ requestedAt: "desc" }, { updatedAt: "desc" }],
+      skip: (filter.page - 1) * filter.limit,
+      take: filter.limit,
+    }),
+    prisma.booking.count({ where }),
+  ]);
+
+  return {
+    bookings: bookings.map(toItemBookingDto),
+    pagination: {
+      page: filter.page,
+      limit: filter.limit,
+      total,
+      totalPages: Math.max(Math.ceil(total / filter.limit), 1),
+    },
+  };
 }

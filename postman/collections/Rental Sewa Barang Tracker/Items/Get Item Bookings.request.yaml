@@ -1,0 +1,16 @@
+$kind: http-request
+name: Get Item Bookings
+method: GET
+url: "{{baseUrl}}api/v1/items/{{itemId}}/bookings?page=1&limit=20"
+description: >-
+  Login wajib sebagai Owner pemilik barang tsb, atau Admin. Mengembalikan
+  seluruh booking untuk `itemId` tsb beserta data penyewa (`name`, `email`),
+  terurut dari yang terbaru diajukan. Filter opsional `status` (salah satu
+  `PENDING`/`APPROVED`/`REJECTED`/`ACTIVE`/`COMPLETED`/`LATE`), pagination
+  `page`/`limit` (max 100). Balas 401 UNAUTHENTICATED kalau belum login, 403
+  FORBIDDEN kalau bukan Owner/Admin atau Owner lain, 404 NOT_FOUND kalau
+  barang tidak ada.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 1600
