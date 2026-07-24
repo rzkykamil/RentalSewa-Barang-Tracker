@@ -30,8 +30,8 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [ ] Unit test business rules BR1–BR2 di service layer
 
 ## Modul Payment Tracking
-- [ ] Prisma schema `Payment` + migration
-- [ ] Endpoint `GET/PATCH /api/v1/bookings/:id/payment`
+- [x] Prisma schema `Payment` + migration
+- [x] Endpoint `GET/PATCH /api/v1/bookings/:id/payment`
 
 ## Modul History
 - [ ] Endpoint `GET /api/v1/history/me` (gabungan booking sbg Owner & Renter, terurut tanggal)

@@ -1,0 +1,11 @@
+$kind: http-request
+name: Get Booking Payment
+method: GET
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/payment"
+description: >-
+  Login wajib — Renter pemilik booking atau Owner barang terkait. Balas 401
+  UNAUTHENTICATED kalau belum login, 404 NOT_FOUND kalau booking tidak ada
+  atau booking belum pernah di-`approve` (record `Payment` baru dibuat
+  otomatis saat approve, lihat BR terkait di `docs/database-design.md`), 403
+  FORBIDDEN kalau login tapi bukan pihak terkait booking tsb.
+order: 1000

@@ -31,6 +31,13 @@ Log keputusan arsitektur penting (format ADR ringan). Setiap entry baru ditambah
 - **Alasan:** mengurangi kompleksitas & biaya integrasi (biaya transaksi gateway, kepatuhan PCI, dsb) di fase awal saat volume transaksi masih kecil.
 - **Dampak:** tidak ada jaminan otomatis bahwa pembayaran benar-benar terjadi (rawan human error/kecurangan pencatatan) — mitigasi lewat riwayat transaksi yang transparan & rating/review. Integrasi Midtrans/Xendit dicatat sebagai Phase 2 di `docs/prd.md`.
 
+## [2026-07-25] Record `Payment` dibuat otomatis saat booking di-approve, bukan lazy-created
+
+- **Konteks:** implementasi Modul Payment Tracking backend (`prisma/schema.prisma`, `src/modules/payments/`). `docs/database-design.md` §Relasi menyatakan "setiap booking yang disetujui punya tepat satu record payment" — perlu diputuskan kapan record `payments` dibuat: otomatis saat `approveBooking`, atau lazy saat Owner pertama kali `PATCH .../payment`.
+- **Keputusan:** record `Payment` dibuat otomatis di dalam `prisma.$transaction` yang sama dengan `approveBooking` (`src/modules/bookings/bookings.service.ts`) — status awal `BELUM_LUNAS`, `amount = totalPrice` booking, `markedByUserId` diisi Owner yang approve (sebagai pembuat record, bukan berarti sudah menandai lunas). Endpoint `GET .../payment` balas `404 NOT_FOUND` kalau booking belum pernah di-approve (record memang belum ada); `PATCH .../payment` balas `422 BUSINESS_RULE_VIOLATION` untuk kasus yang sama.
+- **Alasan:** selaras langsung dengan pernyataan relasi 1:1 di `database-design.md` — tidak ada window waktu di mana booking `APPROVED`/`ACTIVE`/`COMPLETED` tapi belum punya record payment. Konsekuensinya kolom `marked_by_user_id` (not null) selalu terisi valid tanpa perlu nullable/default hack.
+- **Dampak:** `PATCH .../payment` menjadi update murni (bukan upsert) — kalau booking belum `APPROVED` endpoint ini akan selalu gagal dengan `BUSINESS_RULE_VIOLATION`, ini disengaja sesuai alur bisnis (tidak ada pembayaran sebelum request disetujui).
+
 ## [2026-07-20] Reminder via email + in-app, tanpa WhatsApp/SMS di Phase 1
 
 - **Konteks:** brief menyebut "reminder otomatis mendekati/lewat tenggat" tanpa menspesifikasikan channel.

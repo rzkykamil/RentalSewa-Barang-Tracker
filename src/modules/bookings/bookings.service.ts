@@ -245,9 +245,10 @@ function assertItemOwnership(booking: BookingWithItem, ownerId: string): void {
 
 /**
  * `PATCH /bookings/:id/approve` — implements BR1: approves this booking,
- * auto-rejects every other `PENDING` booking for the same item, and locks
- * the item to `DISEWA`. All three writes happen in a single
- * `prisma.$transaction` per `.claude/rules/api-design.md`.
+ * auto-rejects every other `PENDING` booking for the same item, locks the
+ * item to `DISEWA`, and creates the (1:1) `Payment` record for this booking
+ * (`BELUM_LUNAS`, see `docs/database-design.md` §Relasi). All writes happen
+ * in a single `prisma.$transaction` per `.claude/rules/api-design.md`.
  */
 export async function approveBooking(bookingId: string, ownerId: string): Promise<BookingDto> {
   const booking = await findBookingWithItemOrThrow(bookingId);
@@ -277,6 +278,15 @@ export async function approveBooking(bookingId: string, ownerId: string): Promis
     await tx.item.update({
       where: { id: booking.itemId },
       data: { status: "DISEWA" },
+    });
+
+    await tx.payment.create({
+      data: {
+        bookingId: updated.id,
+        amount: updated.totalPrice,
+        status: "BELUM_LUNAS",
+        markedByUserId: ownerId,
+      },
     });
 
     return updated;
