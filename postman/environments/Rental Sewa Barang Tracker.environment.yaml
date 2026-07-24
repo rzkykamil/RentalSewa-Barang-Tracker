@@ -22,3 +22,5 @@ values:
     value: ''
   - key: bookingId
     value: ''
+  - key: internalJobSecret
+    value: dummy-internal-job-secret

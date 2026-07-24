@@ -114,6 +114,8 @@ model Booking {
   renter  User     @relation(fields: [renterId], references: [id])
   payment Payment?
 
+  reminderLogs ReminderLog[]
+
   @@index([itemId, status])
   @@index([renterId])
   @@map("bookings")
@@ -137,4 +139,28 @@ model Payment {
   markedByUser User    @relation(fields: [markedByUserId], references: [id])
 
   @@map("payments")
+}
+
+enum ReminderType {
+  H1_REMINDER
+  OVERDUE_ALERT
+}
+
+enum ReminderChannel {
+  EMAIL
+  IN_APP
+}
+
+model ReminderLog {
+  id        String          @id @default(uuid()) @db.Uuid
+  bookingId String          @map("booking_id") @db.Uuid
+  type      ReminderType
+  channel   ReminderChannel
+  sentAt    DateTime        @default(now()) @map("sent_at") @db.Timestamptz
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@unique([bookingId, type])
+  @@index([bookingId])
+  @@map("reminder_logs")
 }

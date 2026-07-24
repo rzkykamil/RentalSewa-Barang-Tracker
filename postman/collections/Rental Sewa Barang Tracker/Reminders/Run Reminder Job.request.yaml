@@ -1,0 +1,18 @@
+$kind: http-request
+name: Run Reminder Job
+method: POST
+url: "{{baseUrl}}api/v1/internal/reminders/run"
+description: >-
+  Server-only, dipicu scheduled job (bukan session user) — trigger
+  pengecekan booking `ACTIVE`: `end_date` = besok kirim `H1_REMINDER`,
+  `end_date` sudah lewat kirim `OVERDUE_ALERT` + ubah booking → `LATE` dan
+  item → `TELAT_KEMBALI` (BR3), masing-masing maksimal sekali per booking
+  (BR5, ditegakkan lewat unique constraint `reminder_logs(booking_id, type)`).
+  Wajib header `x-internal-job-secret` sama persis dengan `INTERNAL_JOB_SECRET`
+  di server, kalau tidak balas `401 UNAUTHENTICATED`. Di production, worker
+  terjadwal (`worker/reminder-job.ts`) memanggil service layer secara langsung
+  — endpoint ini hanya jalur alternatif (mis. testing manual atau cron
+  berbasis HTTP).
+order: 1000
+headers:
+  x-internal-job-secret: "{{internalJobSecret}}"

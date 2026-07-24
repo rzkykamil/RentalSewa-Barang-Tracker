@@ -38,11 +38,12 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Endpoint `GET /api/v1/items/:id/bookings`
 
 ## Modul Reminder
-- [ ] Prisma schema `ReminderLog` + unique constraint `(booking_id, type)`
-- [ ] `worker/reminder-job.ts`: query booking ACTIVE mendekati/lewat `end_date`
-- [ ] Integrasi email client (SMTP/Resend) untuk kirim reminder
-- [ ] Job overdue: ubah status booking → LATE, item → TELAT_KEMBALI
-- [ ] Setup scheduler (cron container) menjalankan job tiap 15 menit
+- [x] Prisma schema `ReminderLog` + unique constraint `(booking_id, type)`
+- [x] `worker/reminder-job.ts`: query booking ACTIVE mendekati/lewat `end_date`
+- [x] Integrasi email client (SMTP/Resend) untuk kirim reminder
+- [x] Job overdue: ubah status booking → LATE, item → TELAT_KEMBALI
+- [x] Endpoint `POST /api/v1/internal/reminders/run` (secret header, panggil service layer)
+- [ ] Setup scheduler (cron container) menjalankan job tiap 15 menit — belum ada infra Docker/cron di Phase 1 lokal, dicatat sebagai bagian item "Infrastruktur & Hardening" (Docker Compose) di bawah
 - [ ] Unit test BR5 (idempoten, tidak kirim reminder duplikat)
 
 ## Modul Rating/Review
