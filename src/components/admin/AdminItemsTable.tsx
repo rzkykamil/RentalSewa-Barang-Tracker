@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,32 +17,57 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { adminItemsCopy } from "@/lib/copy/admin";
-import type { MockItem } from "@/lib/mock/items";
+import type { AdminItemDto } from "@/modules/admin/admin.service";
 import { formatRupiah } from "@/lib/utils";
 
 interface AdminItemsTableProps {
-  initialItems: MockItem[];
+  initialItems: AdminItemDto[];
 }
 
+interface AdminApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
+
+const FALLBACK_ERROR = "Gagal menonaktifkan barang. Coba lagi.";
+
 /**
- * Admin "Kelola Barang" list. Periode 16 (frontend + mock data only):
- * "force deactivate" only mutates local React state — no real persistence
- * yet, see docs/todo/frontend.md.
+ * Admin "Kelola Barang" list. Force-deactivate calls the real
+ * `PATCH /api/v1/admin/items/:id/deactivate` endpoint and re-fetches the
+ * list via `router.refresh()` (same pattern as `OwnerBookingsList`) —
+ * no local item-state mutation.
  */
 export function AdminItemsTable({ initialItems }: AdminItemsTableProps) {
-  const [items, setItems] = React.useState(initialItems);
+  const router = useRouter();
   const [message, setMessage] = React.useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [pendingItemId, setPendingItemId] = React.useState<string | null>(null);
 
-  function handleForceDeactivate(item: MockItem) {
-    setItems((prev) =>
-      prev.map((candidate) =>
-        candidate.id === item.id ? { ...candidate, status: "NONAKTIF" } : candidate
-      )
-    );
-    setMessage(adminItemsCopy.success);
+  async function handleForceDeactivate(item: AdminItemDto) {
+    setMessage(null);
+    setErrorMessage(null);
+    setPendingItemId(item.id);
+
+    try {
+      const response = await fetch(`/api/v1/admin/items/${item.id}/deactivate`, {
+        method: "PATCH",
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as AdminApiErrorResponse;
+        setErrorMessage(body.error.message || FALLBACK_ERROR);
+        return;
+      }
+
+      setMessage(adminItemsCopy.success);
+      router.refresh();
+    } catch {
+      setErrorMessage(FALLBACK_ERROR);
+    } finally {
+      setPendingItemId(null);
+    }
   }
 
-  if (items.length === 0) {
+  if (initialItems.length === 0) {
     return (
       <EmptyState title={adminItemsCopy.empty.title} description={adminItemsCopy.empty.description} />
     );
@@ -52,6 +78,11 @@ export function AdminItemsTable({ initialItems }: AdminItemsTableProps) {
       {message && (
         <p role="status" className="text-sm font-medium text-status-positive">
           {message}
+        </p>
+      )}
+      {errorMessage && (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {errorMessage}
         </p>
       )}
       <Card>
@@ -68,16 +99,16 @@ export function AdminItemsTable({ initialItems }: AdminItemsTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
+              {initialItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="max-w-56 truncate font-medium text-foreground">
                     {item.name}
                     <span className="block text-xs font-normal text-muted-foreground sm:hidden">
-                      {item.ownerName} &middot; {item.category}
+                      {item.owner.name} &middot; {item.category}
                     </span>
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground sm:table-cell">
-                    {item.ownerName}
+                    {item.owner.name}
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground sm:table-cell">
                     {item.category}
@@ -94,7 +125,7 @@ export function AdminItemsTable({ initialItems }: AdminItemsTableProps) {
                     ) : (
                       <ConfirmDialog
                         trigger={
-                          <Button variant="destructive" size="sm">
+                          <Button variant="destructive" size="sm" disabled={pendingItemId === item.id}>
                             {adminItemsCopy.actions.forceDeactivate}
                           </Button>
                         }

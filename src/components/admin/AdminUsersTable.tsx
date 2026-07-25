@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,35 +18,61 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { UserStatusBadge } from "@/components/admin/UserStatusBadge";
 import { adminUsersCopy } from "@/lib/copy/admin";
-import type { AdminUser } from "@/lib/mock/admin";
+import type { AdminUserDto } from "@/modules/admin/admin.service";
 import { ROLE_LABEL } from "@/lib/mock/session";
 
 interface AdminUsersTableProps {
-  initialUsers: AdminUser[];
+  initialUsers: AdminUserDto[];
+  /** Acting admin's own id — their row hides the deactivate action (BE rejects self-deactivation). */
+  currentUserId: string;
 }
 
-/**
- * Admin "Kelola User" list. Periode 16 (frontend + mock data only):
- * deactivate/activate only mutates local React state — no real
- * persistence yet, see docs/todo/frontend.md.
- */
-export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
-  const [users, setUsers] = React.useState(initialUsers);
-  const [message, setMessage] = React.useState<string | null>(null);
+interface AdminApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
 
-  function handleToggleActive(user: AdminUser) {
-    const nextIsActive = !user.isActive;
-    setUsers((prev) =>
-      prev.map((candidate) =>
-        candidate.id === user.id ? { ...candidate, isActive: nextIsActive } : candidate
-      )
-    );
-    setMessage(
-      nextIsActive ? adminUsersCopy.success.activate : adminUsersCopy.success.deactivate
-    );
+const FALLBACK_ERROR = "Gagal menonaktifkan user. Coba lagi.";
+
+/**
+ * Admin "Kelola User" list. Deactivate calls the real
+ * `PATCH /api/v1/admin/users/:id/deactivate` endpoint and re-fetches the
+ * list via `router.refresh()` (same pattern as `OwnerBookingsList`) — no
+ * local user-state mutation. There is no reactivate endpoint in
+ * `docs/api-spec.md` (only `deactivate`), so a deactivated user's row shows
+ * a static label instead of an "Aktifkan" action.
+ */
+export function AdminUsersTable({ initialUsers, currentUserId }: AdminUsersTableProps) {
+  const router = useRouter();
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [pendingUserId, setPendingUserId] = React.useState<string | null>(null);
+
+  async function handleDeactivate(user: AdminUserDto) {
+    setMessage(null);
+    setErrorMessage(null);
+    setPendingUserId(user.id);
+
+    try {
+      const response = await fetch(`/api/v1/admin/users/${user.id}/deactivate`, {
+        method: "PATCH",
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as AdminApiErrorResponse;
+        setErrorMessage(body.error.message || FALLBACK_ERROR);
+        return;
+      }
+
+      setMessage(adminUsersCopy.success.deactivate);
+      router.refresh();
+    } catch {
+      setErrorMessage(FALLBACK_ERROR);
+    } finally {
+      setPendingUserId(null);
+    }
   }
 
-  if (users.length === 0) {
+  if (initialUsers.length === 0) {
     return (
       <EmptyState title={adminUsersCopy.empty.title} description={adminUsersCopy.empty.description} />
     );
@@ -56,6 +83,11 @@ export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
       {message && (
         <p role="status" className="text-sm font-medium text-status-positive">
           {message}
+        </p>
+      )}
+      {errorMessage && (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {errorMessage}
         </p>
       )}
       <Card>
@@ -71,7 +103,7 @@ export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {initialUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="max-w-48 truncate font-medium text-foreground">
                     {user.name}
@@ -89,30 +121,25 @@ export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
                     <UserStatusBadge isActive={user.isActive} />
                   </TableCell>
                   <TableCell className="text-right">
-                    {user.isActive ? (
+                    {!user.isActive ? (
+                      <span className="text-xs text-muted-foreground">
+                        {adminUsersCopy.alreadyInactive}
+                      </span>
+                    ) : user.id === currentUserId ? (
+                      <span className="text-xs text-muted-foreground">
+                        {adminUsersCopy.selfAccount}
+                      </span>
+                    ) : (
                       <ConfirmDialog
                         trigger={
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" disabled={pendingUserId === user.id}>
                             {adminUsersCopy.actions.deactivate}
                           </Button>
                         }
                         title={adminUsersCopy.dialogs.deactivate.title}
                         description={adminUsersCopy.dialogs.deactivate.description}
                         confirmLabel={adminUsersCopy.dialogs.deactivate.confirm}
-                        onConfirm={() => handleToggleActive(user)}
-                      />
-                    ) : (
-                      <ConfirmDialog
-                        trigger={
-                          <Button variant="outline" size="sm">
-                            {adminUsersCopy.actions.activate}
-                          </Button>
-                        }
-                        title={adminUsersCopy.dialogs.activate.title}
-                        description={adminUsersCopy.dialogs.activate.description}
-                        confirmLabel={adminUsersCopy.dialogs.activate.confirm}
-                        destructive={false}
-                        onConfirm={() => handleToggleActive(user)}
+                        onConfirm={() => handleDeactivate(user)}
                       />
                     )}
                   </TableCell>

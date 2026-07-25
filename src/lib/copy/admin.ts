@@ -21,25 +21,20 @@ export const adminUsersCopy = {
   },
   actions: {
     deactivate: "Nonaktifkan",
-    activate: "Aktifkan",
   },
   dialogs: {
     deactivate: {
       title: "Nonaktifkan user ini?",
       description:
-        "User yang dinonaktifkan tidak dapat login ke platform. Anda bisa mengaktifkannya kembali kapan saja.",
+        "User yang dinonaktifkan tidak dapat login ke platform. Tindakan ini tidak dapat dibatalkan dari panel Admin.",
       confirm: "Ya, Nonaktifkan",
-    },
-    activate: {
-      title: "Aktifkan kembali user ini?",
-      description: "User akan bisa login ke platform kembali.",
-      confirm: "Ya, Aktifkan",
     },
   },
   success: {
-    deactivate: "User berhasil dinonaktifkan (mock — belum tersimpan permanen).",
-    activate: "User berhasil diaktifkan kembali (mock — belum tersimpan permanen).",
+    deactivate: "User berhasil dinonaktifkan.",
   },
+  alreadyInactive: "User ini sudah nonaktif.",
+  selfAccount: "Ini akun Anda sendiri.",
   empty: {
     title: "Belum ada user",
     description: "Belum ada user yang terdaftar di platform.",
@@ -66,7 +61,7 @@ export const adminItemsCopy = {
       "Barang akan langsung ditandai nonaktif dan tidak muncul lagi di halaman Jelajah Barang, terlepas dari status sebelumnya.",
     confirm: "Ya, Nonaktifkan Paksa",
   },
-  success: "Barang berhasil dinonaktifkan paksa (mock — belum tersimpan permanen).",
+  success: "Barang berhasil dinonaktifkan paksa.",
   alreadyInactive: "Barang ini sudah nonaktif.",
   empty: {
     title: "Belum ada barang",

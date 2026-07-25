@@ -12,20 +12,20 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { adminBookingsCopy } from "@/lib/copy/admin";
-import { MOCK_BOOKINGS } from "@/lib/mock/bookings";
+import { listBookingsForAdmin } from "@/modules/admin/admin.service";
 import { formatRupiah } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Kelola Booking — Rental Sewa Barang Tracker",
 };
 
-function formatDateRange(startDate: string, endDate: string): string {
+function formatDateRange(startDate: Date, endDate: Date): string {
   const formatter = new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
-  return `${formatter.format(new Date(startDate))} — ${formatter.format(new Date(endDate))}`;
+  return `${formatter.format(startDate)} — ${formatter.format(endDate)}`;
 }
 
 /**
@@ -33,10 +33,15 @@ function formatDateRange(startDate: string, endDate: string): string {
  * (docs/todo/frontend.md Modul Admin), so this stays a server component
  * unlike the users/items admin tables which need local mutation state.
  */
-export default function AdminBookingsPage() {
-  const bookings = [...MOCK_BOOKINGS].sort(
-    (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
-  );
+export default async function AdminBookingsPage() {
+  let bookings: Awaited<ReturnType<typeof listBookingsForAdmin>>["bookings"] = [];
+  let loadError = false;
+  try {
+    const result = await listBookingsForAdmin({ page: 1, limit: 100 });
+    bookings = result.bookings;
+  } catch {
+    loadError = true;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,7 +50,12 @@ export default function AdminBookingsPage() {
         <p className="text-sm text-muted-foreground">{adminBookingsCopy.subtitle}</p>
       </div>
 
-      {bookings.length === 0 ? (
+      {loadError ? (
+        <EmptyState
+          title="Gagal memuat daftar booking"
+          description="Terjadi kesalahan saat mengambil daftar booking. Coba muat ulang halaman."
+        />
+      ) : bookings.length === 0 ? (
         <EmptyState
           title={adminBookingsCopy.empty.title}
           description={adminBookingsCopy.empty.description}
@@ -68,19 +78,19 @@ export default function AdminBookingsPage() {
                 {bookings.map((booking) => (
                   <TableRow key={booking.id}>
                     <TableCell className="max-w-48 truncate font-medium text-foreground">
-                      {booking.itemName}
+                      {booking.item.name}
                       <span className="block text-xs font-normal text-muted-foreground sm:hidden">
-                        {booking.ownerName} &rarr; {booking.renterName}
+                        {booking.item.ownerName} &rarr; {booking.renter.name}
                       </span>
                       <span className="block text-xs font-normal text-muted-foreground md:hidden">
                         {formatDateRange(booking.startDate, booking.endDate)}
                       </span>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {booking.ownerName}
+                      {booking.item.ownerName}
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {booking.renterName}
+                      {booking.renter.name}
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground md:table-cell">
                       {formatDateRange(booking.startDate, booking.endDate)}

@@ -40,9 +40,9 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [x] Sambungkan tampilan daftar review & rata-rata rating ke data asli
 
 ## Modul Admin
-- [ ] Sambungkan halaman daftar user + aksi nonaktifkan ke endpoint asli
-- [ ] Sambungkan halaman daftar barang + aksi nonaktifkan paksa ke endpoint asli
-- [ ] Sambungkan halaman daftar booking (read-only monitoring) ke data asli
+- [x] Sambungkan halaman daftar user + aksi nonaktifkan ke endpoint asli
+- [x] Sambungkan halaman daftar barang + aksi nonaktifkan paksa ke endpoint asli
+- [x] Sambungkan halaman daftar booking (read-only monitoring) ke data asli
 
 ## Cross-cutting
 - [ ] Audit semua pemanggilan mock data yang tersisa (pastikan tidak ada yang lolos ke production)
@@ -51,3 +51,6 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
+
+- **`docs/api-spec.md` §Admin tidak mendefinisikan endpoint reaktivasi user** (hanya `PATCH /admin/users/:id/deactivate`), padahal UI mock sebelumnya (`docs/todo/frontend.md` Modul Admin) punya tombol "Aktifkan" untuk user nonaktif. Ditemukan saat mengerjakan integrasi Modul Admin — `AdminUsersTable` diubah supaya baris user nonaktif hanya menampilkan label statis ("User ini sudah nonaktif"), tanpa aksi. Perlu didiskusikan dengan user: apakah reaktivasi memang out-of-scope (moderasi satu arah), atau perlu endpoint `PATCH /admin/users/:id/activate` baru.
+- **Halaman `admin/dashboard` (kartu ringkasan Total User/Barang/Booking/User Nonaktif) belum disambungkan** — masih memakai `ALL_USERS`/`MOCK_ITEMS`/`MOCK_BOOKINGS` dari `src/lib/mock/**`. Di luar 3 item checklist Modul Admin di atas (halaman user/barang/booking), jadi belum dikerjakan saat integrasi ini. Perlu endpoint/agregasi count (bisa pakai `pagination.total` dari `listUsers`/`listItemsForAdmin`/`listBookingsForAdmin` yang sudah ada) saat modul ini dikerjakan.
