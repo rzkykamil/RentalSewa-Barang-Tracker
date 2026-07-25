@@ -13,3 +13,11 @@ export function formatRupiah(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount)
 }
+
+/** `total_price = price_per_day * jumlah_hari` (inklusif tanggal mulai & selesai — BR2 di docs/prd.md). */
+export function calculateBookingDays(startDate: string, endDate: string): number {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const diffMs = end.getTime() - start.getTime()
+  return Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1
+}

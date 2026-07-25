@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 
 import { ReminderList } from "@/components/reminders/ReminderList";
 import { renterNotificationsPageCopy } from "@/lib/copy/reminders";
-import { getRemindersForRenter } from "@/lib/mock/reminders";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { listRemindersForRenter } from "@/modules/reminders/reminder.service";
 
 export const metadata: Metadata = {
   title: "Notifikasi — Rental Sewa Barang Tracker",
 };
 
-export default function RenterNotificationsPage() {
-  const reminders = getRemindersForRenter(MOCK_USERS.RENTER.id);
+export default async function RenterNotificationsPage() {
+  const user = await getCurrentUser();
+  const reminders = await listRemindersForRenter(user.id).catch(() => []);
 
   return (
     <div className="flex flex-col gap-6">

@@ -129,3 +129,10 @@ export async function markPaymentStatus(
 
   return toPaymentDto(updated);
 }
+
+/** Number of `BELUM_LUNAS` payments across all of an Owner's items — used for the Owner dashboard summary card. */
+export async function countUnpaidPaymentsForOwner(ownerId: string): Promise<number> {
+  return prisma.payment.count({
+    where: { status: "BELUM_LUNAS", booking: { item: { ownerId } } },
+  });
+}

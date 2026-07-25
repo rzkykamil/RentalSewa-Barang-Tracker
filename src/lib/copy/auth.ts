@@ -4,6 +4,15 @@
  * (see docs/prd.md NFR i18n).
  */
 
+import type { UserRole } from "@/generated/prisma/enums";
+
+/** Indonesian display label per `UserRole`, shown in the dashboard shell topbar badge. */
+export const roleLabel: Record<UserRole, string> = {
+  OWNER: "Pemilik Barang",
+  RENTER: "Penyewa",
+  ADMIN: "Admin",
+};
+
 export const registerCopy = {
   title: "Daftar Akun",
   subtitle: "Buat akun untuk mulai menyewakan atau menyewa barang.",

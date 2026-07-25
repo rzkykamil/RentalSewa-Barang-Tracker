@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { reminderTypeLabel } from "@/lib/copy/reminders";
-import type { ReminderType } from "@/lib/mock/reminders";
+import type { ReminderType } from "@/generated/prisma/enums";
 
 interface ReminderTypeBadgeProps {
   type: ReminderType;

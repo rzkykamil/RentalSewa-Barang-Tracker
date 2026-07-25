@@ -1,21 +1,43 @@
 import type { Metadata } from "next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { listBookingsForUser } from "@/modules/bookings/bookings.service";
+import { countPendingReviewsForRenter } from "@/modules/reviews/reviews.service";
 
 export const metadata: Metadata = {
   title: "Dashboard Renter — Rental Sewa Barang Tracker",
 };
 
-const summaryCards = [
-  { label: "Booking Aktif", value: "—" },
-  { label: "Menunggu Persetujuan", value: "—" },
-  { label: "Riwayat Sewa", value: "—" },
-  { label: "Perlu Direview", value: "—" },
-];
+const FALLBACK_VALUE = "—";
 
-export default function RenterDashboardPage() {
-  const user = MOCK_USERS.RENTER;
+export default async function RenterDashboardPage() {
+  const user = await getCurrentUser();
+
+  let summaryCards = [
+    { label: "Booking Aktif", value: FALLBACK_VALUE },
+    { label: "Menunggu Persetujuan", value: FALLBACK_VALUE },
+    { label: "Riwayat Sewa", value: FALLBACK_VALUE },
+    { label: "Perlu Direview", value: FALLBACK_VALUE },
+  ];
+
+  try {
+    const [activeBookings, pendingBookings, completedBookings, pendingReviews] = await Promise.all([
+      listBookingsForUser(user.id, "RENTER", { status: "ACTIVE", page: 1, limit: 1 }),
+      listBookingsForUser(user.id, "RENTER", { status: "PENDING", page: 1, limit: 1 }),
+      listBookingsForUser(user.id, "RENTER", { status: "COMPLETED", page: 1, limit: 1 }),
+      countPendingReviewsForRenter(user.id),
+    ]);
+
+    summaryCards = [
+      { label: "Booking Aktif", value: String(activeBookings.pagination.total) },
+      { label: "Menunggu Persetujuan", value: String(pendingBookings.pagination.total) },
+      { label: "Riwayat Sewa", value: String(completedBookings.pagination.total) },
+      { label: "Perlu Direview", value: String(pendingReviews) },
+    ];
+  } catch {
+    // Keep fallback dashes — summary cards are non-critical, page should still render.
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,13 +64,6 @@ export default function RenterDashboardPage() {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-muted-foreground">
-          Modul Browse & Booking belum tersedia — halaman ini akan
-          menampilkan data sungguhan setelah modul terkait dikerjakan.
-        </CardContent>
-      </Card>
     </div>
   );
 }

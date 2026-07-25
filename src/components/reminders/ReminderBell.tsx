@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ReminderTypeBadge } from "@/components/reminders/ReminderTypeBadge";
 import { reminderBellCopy } from "@/lib/copy/reminders";
-import { countReminders, type MockReminder } from "@/lib/mock/reminders";
+import { countReminders } from "@/lib/reminders";
+import type { ReminderDto } from "@/modules/reminders/reminder.service";
 
 interface ReminderBellProps {
-  reminders: MockReminder[];
+  reminders: ReminderDto[];
   role: "OWNER" | "RENTER";
 }
 

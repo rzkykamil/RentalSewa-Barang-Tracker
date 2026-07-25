@@ -1,7 +1,67 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
+import type { ReminderType } from "@/generated/prisma/enums";
 import { sendReminderEmail } from "@/lib/email";
 import { logInfo, logError } from "@/lib/logger";
+
+export interface ReminderDto {
+  id: string;
+  bookingId: string;
+  type: ReminderType;
+  itemId: string;
+  itemName: string;
+  ownerId: string;
+  ownerName: string;
+  renterId: string;
+  renterName: string;
+  /** The booking's `endDate` — the return due date this reminder is about. */
+  dueDate: string;
+  sentAt: string;
+}
+
+type ReminderLogWithBooking = Prisma.ReminderLogGetPayload<{
+  include: { booking: { include: { item: { include: { owner: true } }; renter: true } } };
+}>;
+
+function toReminderDto(log: ReminderLogWithBooking): ReminderDto {
+  return {
+    id: log.id,
+    bookingId: log.bookingId,
+    type: log.type,
+    itemId: log.booking.item.id,
+    itemName: log.booking.item.name,
+    ownerId: log.booking.item.owner.id,
+    ownerName: log.booking.item.owner.name,
+    renterId: log.booking.renter.id,
+    renterName: log.booking.renter.name,
+    dueDate: log.booking.endDate.toISOString(),
+    sentAt: log.sentAt.toISOString(),
+  };
+}
+
+/**
+ * In-app notification list for the Owner dashboard/notifications page —
+ * reads the `ReminderLog` rows `runReminderJob()` writes (see below), scoped
+ * to bookings on this Owner's items, newest reminder first.
+ */
+export async function listRemindersForOwner(ownerId: string): Promise<ReminderDto[]> {
+  const logs = await prisma.reminderLog.findMany({
+    where: { booking: { item: { ownerId } } },
+    include: { booking: { include: { item: { include: { owner: true } }, renter: true } } },
+    orderBy: { sentAt: "desc" },
+  });
+  return logs.map(toReminderDto);
+}
+
+/** Same as `listRemindersForOwner`, scoped to bookings made by this Renter. */
+export async function listRemindersForRenter(renterId: string): Promise<ReminderDto[]> {
+  const logs = await prisma.reminderLog.findMany({
+    where: { booking: { renterId } },
+    include: { booking: { include: { item: { include: { owner: true } }, renter: true } } },
+    orderBy: { sentAt: "desc" },
+  });
+  return logs.map(toReminderDto);
+}
 
 /**
  * Summary returned by `runReminderJob()`, surfaced via

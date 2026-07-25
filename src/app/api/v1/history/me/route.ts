@@ -25,6 +25,10 @@ export async function GET(request: NextRequest) {
     return apiError("UNAUTHENTICATED", "Anda belum login.");
   }
 
+  if (session.user.role !== "OWNER" && session.user.role !== "RENTER") {
+    return apiError("FORBIDDEN", "Endpoint ini hanya untuk Renter atau Owner.");
+  }
+
   const query = Object.fromEntries(request.nextUrl.searchParams.entries());
   const parsed = historyQuerySchema.safeParse(query);
   if (!parsed.success) {

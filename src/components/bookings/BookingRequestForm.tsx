@@ -11,8 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/auth/FormField";
 import { bookingRequestFormCopy } from "@/lib/copy/bookings";
-import { calculateBookingDays } from "@/lib/mock/bookings";
-import { formatRupiah } from "@/lib/utils";
+import { calculateBookingDays, formatRupiah } from "@/lib/utils";
 
 interface FieldErrors {
   startDate?: string;

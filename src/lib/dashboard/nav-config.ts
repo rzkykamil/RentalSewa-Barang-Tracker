@@ -11,7 +11,7 @@ import {
   Users,
 } from "lucide-react";
 
-import type { MockRole } from "@/lib/mock/session";
+import type { UserRole } from "@/generated/prisma/enums";
 
 export interface DashboardNavItem {
   label: string;
@@ -31,7 +31,7 @@ export interface DashboardNavItem {
  * (Auth–Review, Admin) has a frontend implementation; `comingSoon` remains
  * available on `DashboardNavItem` for any future module still in progress.
  */
-export const DASHBOARD_NAV: Record<MockRole, DashboardNavItem[]> = {
+export const DASHBOARD_NAV: Record<UserRole, DashboardNavItem[]> = {
   OWNER: [
     { label: "Dashboard", href: "/owner/dashboard", icon: LayoutDashboard },
     { label: "Barang Saya", href: "/owner/items", icon: PackageSearch },

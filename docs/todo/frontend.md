@@ -52,4 +52,4 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
 
-- **Halaman detail barang milik Owner (`owner/items/[id]`) kehilangan section "Riwayat transaksi barang ini".** Section ini sebelumnya menampilkan `MOCK_BOOKINGS` yang difilter per `itemId`; setelah integrasi Modul Barang, `item.id` menjadi UUID asli yang tidak akan pernah cocok dengan id barang mock, jadi section tsb dihapus (bukan dibiarkan tampil kosong secara membingungkan) saat mengerjakan `docs/todo/integrasi.md` Modul Barang. Perlu ditambahkan kembali saat Modul History diintegrasikan (`docs/todo/integrasi.md` Modul History "Sambungkan halaman riwayat transaksi per barang..."), memakai `GET /api/v1/items/:id/bookings`.
+_(kosong — item lama "Riwayat transaksi barang ini di `owner/items/[id]`" sudah dikerjakan saat integrasi Modul History, lihat `docs/todo/integrasi.md`)_

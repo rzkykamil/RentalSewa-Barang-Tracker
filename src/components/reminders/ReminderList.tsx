@@ -4,10 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ReminderTypeBadge } from "@/components/reminders/ReminderTypeBadge";
 import { reminderListCopy } from "@/lib/copy/reminders";
-import type { MockReminder } from "@/lib/mock/reminders";
+import type { ReminderDto } from "@/modules/reminders/reminder.service";
 
 interface ReminderListProps {
-  reminders: MockReminder[];
+  reminders: ReminderDto[];
   /** Determines the counterpart column & booking list link: Owner sees the renter, Renter sees the owner. */
   role: "OWNER" | "RENTER";
 }

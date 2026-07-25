@@ -142,7 +142,9 @@ export default async function OwnerItemDetailPage({ params }: OwnerItemDetailPag
             {transactionHistoryCopy.itemHistorySection.title}
           </h2>
           {loadError ? (
-            <p className="text-sm text-muted-foreground">Gagal memuat riwayat transaksi barang ini.</p>
+            <p role="alert" className="text-sm font-medium text-destructive">
+              Gagal memuat riwayat transaksi barang ini.
+            </p>
           ) : itemHistory.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               {transactionHistoryCopy.itemHistorySection.empty}

@@ -7,5 +7,9 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
-  return <DashboardShell user={user}>{children}</DashboardShell>;
+  return (
+    <DashboardShell user={user} reminders={[]}>
+      {children}
+    </DashboardShell>
+  );
 }

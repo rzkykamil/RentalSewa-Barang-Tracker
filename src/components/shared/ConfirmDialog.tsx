@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Loader2 } from "lucide-react";
 
 import {
   Dialog,
@@ -20,13 +21,18 @@ interface ConfirmDialogProps {
   confirmLabel: string;
   cancelLabel?: string;
   destructive?: boolean;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 }
 
 /**
  * Minimal reusable confirmation dialog wrapping the dialog primitive —
  * used for destructive/irreversible-feeling actions like "Nonaktifkan
  * Barang" (docs/todo/frontend.md cross-cutting `ConfirmDialog`).
+ *
+ * Stays open (with the confirm button disabled + spinner) until `onConfirm`
+ * resolves, so the user gets feedback while the underlying request is in
+ * flight instead of the dialog closing with no visible sign anything is
+ * happening.
  */
 export function ConfirmDialog({
   trigger,
@@ -38,9 +44,20 @@ export function ConfirmDialog({
   onConfirm,
 }: ConfirmDialogProps) {
   const [open, setOpen] = React.useState(false);
+  const [isPending, setIsPending] = React.useState(false);
+
+  async function handleConfirm() {
+    setIsPending(true);
+    try {
+      await onConfirm();
+      setOpen(false);
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(next) => !isPending && setOpen(next)}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -48,16 +65,15 @@ export function ConfirmDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" disabled={isPending} onClick={() => setOpen(false)}>
             {cancelLabel}
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
-            onClick={() => {
-              onConfirm();
-              setOpen(false);
-            }}
+            disabled={isPending}
+            onClick={handleConfirm}
           >
+            {isPending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             {confirmLabel}
           </Button>
         </DialogFooter>

@@ -19,7 +19,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { UserStatusBadge } from "@/components/admin/UserStatusBadge";
 import { adminUsersCopy } from "@/lib/copy/admin";
 import type { AdminUserDto } from "@/modules/admin/admin.service";
-import { ROLE_LABEL } from "@/lib/mock/session";
+import { roleLabel } from "@/lib/copy/auth";
 
 interface AdminUsersTableProps {
   initialUsers: AdminUserDto[];
@@ -115,7 +115,7 @@ export function AdminUsersTable({ initialUsers, currentUserId }: AdminUsersTable
                     {user.email}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{ROLE_LABEL[user.role]}</Badge>
+                    <Badge variant="outline">{roleLabel[user.role]}</Badge>
                   </TableCell>
                   <TableCell>
                     <UserStatusBadge isActive={user.isActive} />

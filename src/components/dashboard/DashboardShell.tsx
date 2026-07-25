@@ -18,12 +18,14 @@ import {
 import { ReminderBell } from "@/components/reminders/ReminderBell";
 import { cn } from "@/lib/utils";
 import { DASHBOARD_NAV } from "@/lib/dashboard/nav-config";
-import { getRemindersForOwner, getRemindersForRenter } from "@/lib/mock/reminders";
-import { ROLE_LABEL } from "@/lib/mock/session";
+import { roleLabel } from "@/lib/copy/auth";
 import type { UserProfile } from "@/modules/auth/auth.service";
+import type { ReminderDto } from "@/modules/reminders/reminder.service";
 
 interface DashboardShellProps {
   user: UserProfile;
+  /** Pre-scoped (Owner/Renter) reminders, resolved server-side by the role layout — empty for Admin. */
+  reminders: ReminderDto[];
   children: React.ReactNode;
 }
 
@@ -36,7 +38,7 @@ interface DashboardShellProps {
  * `user` is the real profile resolved server-side by each role's
  * layout.tsx via `getCurrentUser()`.
  */
-export function DashboardShell({ user, children }: DashboardShellProps) {
+export function DashboardShell({ user, reminders, children }: DashboardShellProps) {
   const pathname = usePathname();
   const navItems = DASHBOARD_NAV[user.role];
 
@@ -46,15 +48,6 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
   const profileHref = navItems.find((item) => item.label === "Profil")?.href ?? "#";
 
-  // Reminders (H-1 / overdue) only apply to Owner and Renter roles — Admin
-  // has no bookings of its own to be reminded about, per docs/prd.md.
-  const reminders =
-    user.role === "OWNER"
-      ? getRemindersForOwner(user.id)
-      : user.role === "RENTER"
-        ? getRemindersForRenter(user.id)
-        : [];
-
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-muted/40">
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-background px-4 sm:px-6">
@@ -62,7 +55,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           Rental Sewa Barang Tracker
         </span>
         <Badge variant="outline" className="ml-1">
-          {ROLE_LABEL[user.role]}
+          {roleLabel[user.role]}
         </Badge>
 
         <div className="ml-auto flex items-center gap-2">

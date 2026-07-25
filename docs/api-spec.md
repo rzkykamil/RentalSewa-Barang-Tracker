@@ -37,10 +37,10 @@
 | Method | Path | Deskripsi | Role |
 |---|---|---|---|
 | POST | `/auth/register` | Registrasi user baru (pilih role Owner/Renter) | Public |
-| POST | `/auth/login` | Login (ditangani NextAuth credentials callback) | Public |
-| POST | `/auth/logout` | Logout, hapus sesi | Semua role login |
 | GET | `/auth/me` | Ambil data profil user yang sedang login | Semua role login |
 | PATCH | `/auth/me` | Update profil (nama, phone, avatar) | Semua role login |
+
+Login & logout **tidak** punya route handler sendiri di `/api/v1/auth/**` — keduanya ditangani oleh NextAuth's built-in catch-all route `/api/auth/[...nextauth]` (credentials `signIn`/`signOut`), bukan endpoint versioned kustom. Implementasi: `src/app/api/auth/[...nextauth]/route.ts`.
 
 ### Items (`/api/v1/items`)
 | Method | Path | Deskripsi | Role |
@@ -56,7 +56,7 @@
 | Method | Path | Deskripsi | Role |
 |---|---|---|---|
 | GET | `/bookings` | List booking milik sendiri (Renter: sbg penyewa; Owner: utk barang miliknya) | Renter, Owner |
-| POST | `/bookings` | Ajukan request sewa (`item_id`, `start_date`, `end_date`) | Renter |
+| POST | `/bookings` | Ajukan request sewa (`itemId`, `startDate`, `endDate`) | Renter |
 | GET | `/bookings/:id` | Detail booking | Renter/Owner terkait, Admin |
 | PATCH | `/bookings/:id/approve` | Owner menyetujui request → status `APPROVED`, item → `DISEWA`, request lain auto-`REJECTED` (BR1) | Owner (pemilik item) |
 | PATCH | `/bookings/:id/reject` | Owner menolak request → status `REJECTED` | Owner (pemilik item) |
@@ -68,6 +68,8 @@
 |---|---|---|---|
 | GET | `/bookings/:id/payment` | Lihat status pembayaran booking | Renter/Owner terkait |
 | PATCH | `/bookings/:id/payment` | Tandai status pembayaran (`LUNAS`/`BELUM_LUNAS`) + catatan metode | Owner (pemilik item) |
+
+`PATCH` mengembalikan `422 BUSINESS_RULE_VIOLATION` kalau booking belum pernah `APPROVED` — belum ada row `Payment` untuk ditandai (row dibuat saat approve, lihat `approveBooking`).
 
 ### Reviews (`/api/v1/bookings/:id/review`)
 | Method | Path | Deskripsi | Role |
@@ -88,6 +90,10 @@
 | GET | `/admin/items` | List seluruh barang (termasuk nonaktif) | Admin |
 | PATCH | `/admin/items/:id/deactivate` | Paksa nonaktifkan barang | Admin |
 | GET | `/admin/bookings` | List seluruh booking untuk monitoring | Admin |
+
+`PATCH /admin/users/:id/deactivate` menolak self-deactivation (`422 BUSINESS_RULE_VIOLATION`) — Admin tidak bisa menonaktifkan akunnya sendiri, supaya tidak terkunci keluar sendiri.
+
+Belum ada endpoint reaktivasi user (`PATCH /admin/users/:id/activate`) — lihat `docs/todo/integrasi.md` Backlog/Temuan untuk diskusi apakah moderasi memang satu arah.
 
 ### Reminder (internal, dipicu scheduled job — bukan dipanggil langsung dari frontend)
 | Method | Path | Deskripsi | Role |

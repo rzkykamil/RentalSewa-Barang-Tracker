@@ -1,21 +1,44 @@
 import type { Metadata } from "next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { listItemsByOwner } from "@/modules/items/items.service";
+import { listBookingsForUser } from "@/modules/bookings/bookings.service";
+import { countUnpaidPaymentsForOwner } from "@/modules/payments/payments.service";
 
 export const metadata: Metadata = {
   title: "Dashboard Owner — Rental Sewa Barang Tracker",
 };
 
-const summaryCards = [
-  { label: "Barang Aktif", value: "—" },
-  { label: "Request Masuk", value: "—" },
-  { label: "Booking Berjalan", value: "—" },
-  { label: "Belum Lunas", value: "—" },
-];
+const FALLBACK_VALUE = "—";
 
-export default function OwnerDashboardPage() {
-  const user = MOCK_USERS.OWNER;
+export default async function OwnerDashboardPage() {
+  const user = await getCurrentUser();
+
+  let summaryCards = [
+    { label: "Barang Aktif", value: FALLBACK_VALUE },
+    { label: "Request Masuk", value: FALLBACK_VALUE },
+    { label: "Booking Berjalan", value: FALLBACK_VALUE },
+    { label: "Belum Lunas", value: FALLBACK_VALUE },
+  ];
+
+  try {
+    const [items, pendingRequests, activeBookings, unpaidCount] = await Promise.all([
+      listItemsByOwner(user.id),
+      listBookingsForUser(user.id, "OWNER", { status: "PENDING", page: 1, limit: 1 }),
+      listBookingsForUser(user.id, "OWNER", { status: "ACTIVE", page: 1, limit: 1 }),
+      countUnpaidPaymentsForOwner(user.id),
+    ]);
+
+    summaryCards = [
+      { label: "Barang Aktif", value: String(items.filter((item) => item.status !== "NONAKTIF").length) },
+      { label: "Request Masuk", value: String(pendingRequests.pagination.total) },
+      { label: "Booking Berjalan", value: String(activeBookings.pagination.total) },
+      { label: "Belum Lunas", value: String(unpaidCount) },
+    ];
+  } catch {
+    // Keep fallback dashes — summary cards are non-critical, page should still render.
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,13 +65,6 @@ export default function OwnerDashboardPage() {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-muted-foreground">
-          Modul barang & booking belum tersedia — halaman ini akan
-          menampilkan data sungguhan setelah modul terkait dikerjakan.
-        </CardContent>
-      </Card>
     </div>
   );
 }

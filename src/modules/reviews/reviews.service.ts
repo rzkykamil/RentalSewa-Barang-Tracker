@@ -119,6 +119,13 @@ export async function getReviewForBooking(bookingId: string): Promise<ReviewDto 
   return review ? toReviewDto(review) : null;
 }
 
+/** Number of `COMPLETED` bookings a Renter has not reviewed yet — used for the Renter dashboard summary card. */
+export async function countPendingReviewsForRenter(renterId: string): Promise<number> {
+  return prisma.booking.count({
+    where: { renterId, status: "COMPLETED", review: null },
+  });
+}
+
 export interface ItemReviewDto {
   id: string;
   rating: number;

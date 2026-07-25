@@ -10,7 +10,8 @@ description: >-
   (`RENTER`/`OWNER`) untuk membedakan konteks. Filter opsional `status`
   (salah satu `PENDING`/`APPROVED`/`REJECTED`/`ACTIVE`/`COMPLETED`/`LATE`),
   pagination `page`/`limit` (max 100). Balas 401 UNAUTHENTICATED kalau belum
-  login.
+  login, 403 FORBIDDEN kalau login dengan role selain Renter/Owner (mis.
+  Admin).
 queryParams:
   page: "1"
   limit: "20"

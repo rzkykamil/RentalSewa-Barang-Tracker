@@ -1,27 +1,42 @@
 import type { Metadata } from "next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ALL_USERS } from "@/lib/mock/admin";
-import { MOCK_BOOKINGS } from "@/lib/mock/bookings";
-import { MOCK_ITEMS } from "@/lib/mock/items";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { listUsers, listItemsForAdmin, listBookingsForAdmin } from "@/modules/admin/admin.service";
 
 export const metadata: Metadata = {
   title: "Dashboard Admin — Rental Sewa Barang Tracker",
 };
 
-export default function AdminDashboardPage() {
-  const user = MOCK_USERS.ADMIN;
+const FALLBACK_VALUE = "—";
 
-  const summaryCards = [
-    { label: "Total User", value: String(ALL_USERS.length) },
-    { label: "Total Barang", value: String(MOCK_ITEMS.length) },
-    { label: "Total Booking", value: String(MOCK_BOOKINGS.length) },
-    {
-      label: "User Nonaktif",
-      value: String(ALL_USERS.filter((candidate) => !candidate.isActive).length),
-    },
+export default async function AdminDashboardPage() {
+  const user = await getCurrentUser();
+
+  let summaryCards = [
+    { label: "Total User", value: FALLBACK_VALUE },
+    { label: "Total Barang", value: FALLBACK_VALUE },
+    { label: "Total Booking", value: FALLBACK_VALUE },
+    { label: "User Nonaktif", value: FALLBACK_VALUE },
   ];
+
+  try {
+    const [allUsers, inactiveUsers, items, bookings] = await Promise.all([
+      listUsers({ page: 1, limit: 1 }),
+      listUsers({ isActive: false, page: 1, limit: 1 }),
+      listItemsForAdmin({ page: 1, limit: 1 }),
+      listBookingsForAdmin({ page: 1, limit: 1 }),
+    ]);
+
+    summaryCards = [
+      { label: "Total User", value: String(allUsers.pagination.total) },
+      { label: "Total Barang", value: String(items.pagination.total) },
+      { label: "Total Booking", value: String(bookings.pagination.total) },
+      { label: "User Nonaktif", value: String(inactiveUsers.pagination.total) },
+    ];
+  } catch {
+    // Keep fallback dashes — summary cards are non-critical, page should still render.
+  }
 
   return (
     <div className="flex flex-col gap-6">
