@@ -18,10 +18,11 @@ export const reviewFormCopy = {
   },
   submit: "Kirim Ulasan",
   submitLoading: "Mengirim ulasan...",
-  success: "Ulasan berhasil dikirim (mock — belum tersimpan permanen).",
+  success: "Ulasan berhasil dikirim.",
   errors: {
     ratingRequired: "Pilih rating 1-5 bintang.",
     commentRequired: "Komentar wajib diisi.",
+    submitFailed: "Gagal mengirim ulasan. Coba lagi.",
   },
   starLabel: (star: number) => `Beri rating ${star} dari 5 bintang`,
 } as const;

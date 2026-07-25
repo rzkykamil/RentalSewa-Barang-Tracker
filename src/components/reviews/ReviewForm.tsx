@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { reviewFormCopy } from "@/lib/copy/reviews";
 interface ReviewFormProps {
   bookingId: string;
   itemName: string;
-  onSubmitted: (rating: number, comment: string) => void;
+  onSubmitted: () => void;
 }
 
 interface FormErrors {
@@ -20,18 +21,18 @@ interface FormErrors {
   comment?: string;
 }
 
-/**
- * Form to give a 1-5 star rating + comment for a COMPLETED booking. Periode
- * 13 (frontend + mock data only): submitting only calls `onSubmitted` so the
- * parent page can update local state — no real persistence to MOCK_REVIEWS
- * yet, matching the mock-mutation pattern used by OwnerPaymentForm/ItemForm
- * (see docs/todo/frontend.md Modul Rating/Review).
- */
+interface ReviewApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
+
+/** Form to give a 1-5 star rating + comment for a `COMPLETED` booking (BR4). */
 export function ReviewForm({ bookingId, itemName, onSubmitted }: ReviewFormProps) {
+  const router = useRouter();
   const [rating, setRating] = React.useState(0);
   const [comment, setComment] = React.useState("");
   const [errors, setErrors] = React.useState<FormErrors>({});
   const [isLoading, setIsLoading] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const commentFieldId = `review-comment-${bookingId}`;
 
@@ -42,19 +43,32 @@ export function ReviewForm({ bookingId, itemName, onSubmitted }: ReviewFormProps
     return nextErrors;
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextErrors = validate();
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    setSubmitError(null);
     setIsLoading(true);
-
-    // Simulated network round-trip (mock only — no real persistence yet).
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/api/v1/bookings/${bookingId}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment: comment.trim() }),
+      });
+      if (!response.ok) {
+        const body = (await response.json()) as ReviewApiErrorResponse;
+        setSubmitError(body.error.message || reviewFormCopy.errors.submitFailed);
+        return;
+      }
+      router.refresh();
+      onSubmitted();
+    } catch {
+      setSubmitError(reviewFormCopy.errors.submitFailed);
+    } finally {
       setIsLoading(false);
-      onSubmitted(rating, comment.trim());
-    }, 600);
+    }
   }
 
   return (
@@ -87,6 +101,8 @@ export function ReviewForm({ bookingId, itemName, onSubmitted }: ReviewFormProps
           aria-invalid={Boolean(errors.comment)}
         />
       </FormField>
+
+      {submitError && <p className="text-sm text-destructive">{submitError}</p>}
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>

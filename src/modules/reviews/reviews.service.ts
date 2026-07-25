@@ -113,6 +113,12 @@ export async function createReviewForBooking(
   }
 }
 
+/** Looks up the review for a booking, if one exists (`Review.bookingId` is unique). */
+export async function getReviewForBooking(bookingId: string): Promise<ReviewDto | null> {
+  const review = await prisma.review.findUnique({ where: { bookingId } });
+  return review ? toReviewDto(review) : null;
+}
+
 export interface ItemReviewDto {
   id: string;
   rating: number;

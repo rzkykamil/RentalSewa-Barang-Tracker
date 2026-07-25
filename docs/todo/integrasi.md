@@ -36,8 +36,8 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [ ] Sambungkan halaman/list notifikasi in-app ke endpoint asli
 
 ## Modul Rating/Review
-- [ ] Sambungkan form beri rating & komentar ke endpoint review asli
-- [ ] Sambungkan tampilan daftar review & rata-rata rating ke data asli
+- [x] Sambungkan form beri rating & komentar ke endpoint review asli
+- [x] Sambungkan tampilan daftar review & rata-rata rating ke data asli
 
 ## Modul Admin
 - [ ] Sambungkan halaman daftar user + aksi nonaktifkan ke endpoint asli

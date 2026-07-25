@@ -9,6 +9,7 @@ import { getUserProfile } from "@/modules/auth/auth.service";
 import { getItemById } from "@/modules/items/items.service";
 import { listBookingsForUser, type BookingDto } from "@/modules/bookings/bookings.service";
 import { getPaymentForBooking } from "@/modules/payments/payments.service";
+import { getReviewForBooking } from "@/modules/reviews/reviews.service";
 
 export const metadata: Metadata = {
   title: "Booking Saya — Rental Sewa Barang Tracker",
@@ -32,6 +33,15 @@ async function enrichBookingsForRenter(bookings: BookingDto[]): Promise<RenterBo
   const owners = await Promise.all(uniqueOwnerIds.map((ownerId) => getUserProfile(ownerId)));
   const ownerById = new Map(owners.filter((owner) => owner !== null).map((owner) => [owner.id, owner]));
 
+  const reviewChecks = await Promise.all(
+    bookings.map(async (booking) =>
+      booking.status === "COMPLETED"
+        ? ([booking.id, Boolean(await getReviewForBooking(booking.id))] as const)
+        : ([booking.id, false] as const)
+    )
+  );
+  const hasReviewById = new Map(reviewChecks);
+
   return bookings.map((booking) => {
     const item = itemById.get(booking.itemId);
     const ownerName = item ? (ownerById.get(item.ownerId)?.name ?? "Pemilik tidak ditemukan") : "Pemilik tidak ditemukan";
@@ -45,6 +55,7 @@ async function enrichBookingsForRenter(bookings: BookingDto[]): Promise<RenterBo
       totalPrice: booking.totalPrice,
       status: booking.status,
       notes: booking.notes,
+      hasReview: hasReviewById.get(booking.id) ?? false,
     };
   });
 }

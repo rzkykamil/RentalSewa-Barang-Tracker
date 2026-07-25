@@ -17,7 +17,6 @@ import { PaymentStatusDisplay } from "@/components/payments/PaymentStatusDisplay
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { renterBookingsCopy, type BookingStatusValue } from "@/lib/copy/bookings";
 import { reviewFormCopy } from "@/lib/copy/reviews";
-import { hasReviewForBooking } from "@/lib/mock/items";
 import { bookingHasPayment, type PaymentDto } from "@/lib/copy/payments";
 import { formatRupiah } from "@/lib/utils";
 
@@ -31,6 +30,7 @@ export interface RenterBooking {
   totalPrice: number;
   status: BookingStatusValue;
   notes: string | null;
+  hasReview: boolean;
 }
 
 interface RenterBookingCardProps {
@@ -46,7 +46,7 @@ function formatDateRange(startDate: string, endDate: string): string {
 export function RenterBookingCard({ booking, payment }: RenterBookingCardProps) {
   const [reviewDialogOpen, setReviewDialogOpen] = React.useState(false);
   const [justReviewed, setJustReviewed] = React.useState(false);
-  const canReview = booking.status === "COMPLETED" && !hasReviewForBooking(booking.id) && !justReviewed;
+  const canReview = booking.status === "COMPLETED" && !booking.hasReview && !justReviewed;
 
   return (
     <Card>
