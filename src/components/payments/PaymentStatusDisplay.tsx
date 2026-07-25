@@ -1,9 +1,8 @@
 import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
-import { renterPaymentCopy } from "@/lib/copy/payments";
-import { DEFAULT_PAYMENT_STATUS, type MockPayment } from "@/lib/mock/payments";
+import { DEFAULT_PAYMENT_STATUS, renterPaymentCopy, type PaymentDto } from "@/lib/copy/payments";
 
 interface PaymentStatusDisplayProps {
-  payment: MockPayment | null;
+  payment: PaymentDto | null;
 }
 
 /**

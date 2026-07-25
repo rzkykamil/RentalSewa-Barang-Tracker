@@ -18,7 +18,7 @@ import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { renterBookingsCopy, type BookingStatusValue } from "@/lib/copy/bookings";
 import { reviewFormCopy } from "@/lib/copy/reviews";
 import { hasReviewForBooking } from "@/lib/mock/items";
-import { bookingHasPayment, type MockPayment } from "@/lib/mock/payments";
+import { bookingHasPayment, type PaymentDto } from "@/lib/copy/payments";
 import { formatRupiah } from "@/lib/utils";
 
 /** Enriched booking (real `BookingDto` + resolved item/owner names) for the Renter "Booking Saya" page. */
@@ -35,7 +35,7 @@ export interface RenterBooking {
 
 interface RenterBookingCardProps {
   booking: RenterBooking;
-  payment: MockPayment | null;
+  payment: PaymentDto | null;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {

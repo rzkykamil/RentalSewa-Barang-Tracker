@@ -14,22 +14,26 @@ import {
 } from "@/components/ui/select";
 import { FormField } from "@/components/auth/FormField";
 import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
-import { ownerPaymentCopy } from "@/lib/copy/payments";
-import { DEFAULT_PAYMENT_STATUS, type MockPayment, type PaymentStatus } from "@/lib/mock/payments";
+import {
+  DEFAULT_PAYMENT_STATUS,
+  ownerPaymentCopy,
+  type PaymentDto,
+  type PaymentStatus,
+} from "@/lib/copy/payments";
 
 interface OwnerPaymentFormProps {
   bookingId: string;
-  payment: MockPayment | null;
-  onSave: (status: PaymentStatus, methodNote: string | null) => void;
+  payment: PaymentDto | null;
+  onSave: (status: PaymentStatus, methodNote: string | null) => Promise<void>;
 }
 
 /**
  * Owner-only form to mark a booking's payment as LUNAS/BELUM_LUNAS with an
  * optional free-text method note (`method_note` in docs/database-design.md
  * — no fixed enum of payment methods, so a text field matches the planned
- * schema). Periode 10 (frontend + mock data only): saving only updates
- * local React state via `onSave`, no real persistence — see
- * docs/todo/frontend.md.
+ * schema). `onSave` performs the real `PATCH /bookings/:id/payment` call
+ * (see `OwnerBookingsList`) — this form only owns its own loading/success/
+ * error UI state.
  */
 export function OwnerPaymentForm({ bookingId, payment, onSave }: OwnerPaymentFormProps) {
   const [status, setStatus] = React.useState<PaymentStatus>(
@@ -38,21 +42,25 @@ export function OwnerPaymentForm({ bookingId, payment, onSave }: OwnerPaymentFor
   const [methodNote, setMethodNote] = React.useState(payment?.methodNote ?? "");
   const [isLoading, setIsLoading] = React.useState(false);
   const [justSaved, setJustSaved] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const statusFieldId = `payment-status-${bookingId}`;
   const methodNoteFieldId = `payment-method-note-${bookingId}`;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setJustSaved(false);
+    setErrorMessage(null);
 
-    // Simulated network round-trip (mock only — no real persistence yet).
-    setTimeout(() => {
-      onSave(status, methodNote.trim() ? methodNote.trim() : null);
-      setIsLoading(false);
+    try {
+      await onSave(status, methodNote.trim() ? methodNote.trim() : null);
       setJustSaved(true);
-    }, 600);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : ownerPaymentCopy.error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -100,6 +108,12 @@ export function OwnerPaymentForm({ bookingId, payment, onSave }: OwnerPaymentFor
         {justSaved && (
           <p role="status" className="text-sm font-medium text-status-positive">
             {ownerPaymentCopy.success}
+          </p>
+        )}
+
+        {errorMessage && (
+          <p role="alert" className="text-sm font-medium text-destructive">
+            {errorMessage}
           </p>
         )}
 

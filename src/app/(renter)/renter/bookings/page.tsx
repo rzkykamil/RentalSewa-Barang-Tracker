@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { RenterBookingCard, type RenterBooking } from "@/components/bookings/RenterBookingCard";
 import { renterBookingsCopy } from "@/lib/copy/bookings";
-import { getPaymentByBookingId } from "@/lib/mock/payments";
+import { bookingHasPayment, type PaymentDto } from "@/lib/copy/payments";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { getUserProfile } from "@/modules/auth/auth.service";
 import { getItemById } from "@/modules/items/items.service";
 import { listBookingsForUser, type BookingDto } from "@/modules/bookings/bookings.service";
+import { getPaymentForBooking } from "@/modules/payments/payments.service";
 
 export const metadata: Metadata = {
   title: "Booking Saya — Rental Sewa Barang Tracker",
@@ -48,14 +49,47 @@ async function enrichBookingsForRenter(bookings: BookingDto[]): Promise<RenterBo
   });
 }
 
+/**
+ * Resolves the payment record for each booking whose status makes payment
+ * tracking relevant (`bookingHasPayment`, docs/todo/integrasi.md Modul
+ * Payment Tracking). Fetched directly via the service layer (same pattern
+ * as `enrichBookingsForRenter` above) — `markedPaidAt` is serialized to an
+ * ISO string since this crosses the server/client boundary into
+ * `RenterBookingCard`.
+ */
+async function enrichPaymentsForRenter(
+  bookings: BookingDto[],
+  renterId: string
+): Promise<Record<string, PaymentDto | null>> {
+  const relevantBookings = bookings.filter((booking) => bookingHasPayment(booking.status));
+
+  const entries = await Promise.all(
+    relevantBookings.map(async (booking) => {
+      try {
+        const payment = await getPaymentForBooking(booking.id, renterId, "RENTER");
+        const dto: PaymentDto | null = payment
+          ? { ...payment, markedPaidAt: payment.markedPaidAt?.toISOString() ?? null }
+          : null;
+        return [booking.id, dto] as const;
+      } catch {
+        return [booking.id, null] as const;
+      }
+    })
+  );
+
+  return Object.fromEntries(entries);
+}
+
 export default async function RenterBookingsPage() {
   const user = await getCurrentUser();
 
   let bookings: RenterBooking[] = [];
+  let payments: Record<string, PaymentDto | null> = {};
   let loadError = false;
   try {
     const result = await listBookingsForUser(user.id, "RENTER", { page: 1, limit: 100 });
     bookings = await enrichBookingsForRenter(result.bookings);
+    payments = await enrichPaymentsForRenter(result.bookings, user.id);
   } catch {
     loadError = true;
   }
@@ -83,7 +117,7 @@ export default async function RenterBookingsPage() {
             <RenterBookingCard
               key={booking.id}
               booking={booking}
-              payment={getPaymentByBookingId(booking.id)}
+              payment={payments[booking.id] ?? null}
             />
           ))}
         </div>

@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { paymentStatusLabel } from "@/lib/copy/payments";
-import type { PaymentStatus } from "@/lib/mock/payments";
+import { paymentStatusLabel, type PaymentStatus } from "@/lib/copy/payments";
 
 interface PaymentStatusBadgeProps {
   status: PaymentStatus;

@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { OwnerBookingCard, type OwnerBooking } from "@/components/bookings/OwnerBookingCard";
 import { ownerBookingsCopy } from "@/lib/copy/bookings";
-import { MOCK_PAYMENTS, type MockPayment, type PaymentStatus } from "@/lib/mock/payments";
+import { ownerPaymentCopy, type PaymentDto, type PaymentStatus } from "@/lib/copy/payments";
 
 interface OwnerBookingsListProps {
   initialBookings: OwnerBooking[];
+  /** Payment lookup keyed by `bookingId`, resolved server-side (see `owner/bookings/page.tsx`). */
+  initialPayments: Record<string, PaymentDto | null>;
 }
 
 interface BookingApiErrorResponse {
@@ -33,36 +35,38 @@ const ACTION_FALLBACK_ERROR: Record<BookingAction, string> = {
 
 /**
  * Client-side owner "Request Masuk" list. Approve/reject/mark-active/
- * mark-completed call the real status-machine endpoints in
+ * mark-completed/payment status updates all call the real endpoints in
  * `src/app/api/v1/bookings/[id]/**` and re-fetch the list via
- * `router.refresh()` afterwards — no local booking-state mutation. Payment
- * status updates remain mock-only (Modul Payment Tracking, out of scope
- * for this integration pass — see docs/todo/integrasi.md).
+ * `router.refresh()` afterwards — no local booking/payment-state mutation,
+ * `initialBookings`/`initialPayments` are re-resolved server-side on refresh.
  */
-export function OwnerBookingsList({ initialBookings }: OwnerBookingsListProps) {
+export function OwnerBookingsList({ initialBookings, initialPayments }: OwnerBookingsListProps) {
   const router = useRouter();
-  const [payments, setPayments] = React.useState(MOCK_PAYMENTS);
   const [message, setMessage] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [pendingBookingId, setPendingBookingId] = React.useState<string | null>(null);
 
-  function getPayment(bookingId: string): MockPayment | null {
-    return payments.find((payment) => payment.bookingId === bookingId) ?? null;
+  function getPayment(bookingId: string): PaymentDto | null {
+    return initialPayments[bookingId] ?? null;
   }
 
-  function handleUpdatePayment(bookingId: string, status: PaymentStatus, methodNote: string | null) {
-    setPayments((prev) => {
-      const exists = prev.some((payment) => payment.bookingId === bookingId);
-      const markedPaidAt = status === "LUNAS" ? new Date().toISOString() : null;
-
-      if (!exists) {
-        return [...prev, { bookingId, status, methodNote, markedPaidAt }];
-      }
-
-      return prev.map((payment) =>
-        payment.bookingId === bookingId ? { ...payment, status, methodNote, markedPaidAt } : payment
-      );
+  async function handleUpdatePayment(
+    bookingId: string,
+    status: PaymentStatus,
+    methodNote: string | null
+  ) {
+    const response = await fetch(`/api/v1/bookings/${bookingId}/payment`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, methodNote: methodNote ?? undefined }),
     });
+
+    if (!response.ok) {
+      const body = (await response.json()) as BookingApiErrorResponse;
+      throw new Error(body.error.message || ownerPaymentCopy.error);
+    }
+
+    router.refresh();
   }
 
   async function runAction(bookingId: string, action: BookingAction) {

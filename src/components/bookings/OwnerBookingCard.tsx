@@ -4,7 +4,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { OwnerPaymentForm } from "@/components/payments/OwnerPaymentForm";
 import { ownerBookingsCopy, type BookingStatusValue } from "@/lib/copy/bookings";
-import { bookingHasPayment, type MockPayment, type PaymentStatus } from "@/lib/mock/payments";
+import { bookingHasPayment, type PaymentDto, type PaymentStatus } from "@/lib/copy/payments";
 import { formatRupiah } from "@/lib/utils";
 
 /** Enriched booking (real `BookingDto` + resolved item/renter names) for the Owner "Request Masuk" page. */
@@ -21,12 +21,12 @@ export interface OwnerBooking {
 
 interface OwnerBookingCardProps {
   booking: OwnerBooking;
-  payment: MockPayment | null;
+  payment: PaymentDto | null;
   onApprove: () => void;
   onReject: () => void;
   onMarkActive: () => void;
   onMarkCompleted: () => void;
-  onUpdatePayment: (status: PaymentStatus, methodNote: string | null) => void;
+  onUpdatePayment: (status: PaymentStatus, methodNote: string | null) => Promise<void>;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {

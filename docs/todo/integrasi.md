@@ -24,8 +24,8 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [x] Sambungkan tombol Owner "tandai aktif / tandai selesai" ke endpoint asli
 
 ## Modul Payment Tracking
-- [ ] Sambungkan UI tandai status pembayaran (LUNAS/BELUM_LUNAS) ke endpoint asli
-- [ ] Sambungkan tampilan status pembayaran di detail booking ke data asli
+- [x] Sambungkan UI tandai status pembayaran (LUNAS/BELUM_LUNAS) ke endpoint asli
+- [x] Sambungkan tampilan status pembayaran di detail booking ke data asli
 
 ## Modul History
 - [ ] Sambungkan halaman riwayat transaksi per user ke query history asli
@@ -51,3 +51,5 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
+
+- `src/lib/mock/payments.ts` belum bisa dihapus setelah integrasi Modul Payment Tracking selesai — `src/components/history/TransactionHistoryList.tsx` (Modul History, belum diintegrasikan) masih memakai `getPaymentByBookingId`/`bookingHasPayment`/`DEFAULT_PAYMENT_STATUS` dari file tsb. Hapus mock file ini sekalian saat mengerjakan item Modul History di atas.
