@@ -1,0 +1,14 @@
+$kind: http-request
+name: List Bookings
+method: GET
+url: "{{baseUrl}}api/v1/admin/bookings?page=1&limit=20"
+description: >-
+  Admin only. List seluruh booking untuk monitoring (read-only, tidak
+  discope ke user tertentu), sertakan ringkasan item + renter. Filter
+  opsional `status` (salah satu `PENDING`/`APPROVED`/`REJECTED`/`ACTIVE`/
+  `COMPLETED`/`LATE`), pagination `page`/`limit` (max 100). Balas 403
+  FORBIDDEN kalau login tapi bukan Admin.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 5000

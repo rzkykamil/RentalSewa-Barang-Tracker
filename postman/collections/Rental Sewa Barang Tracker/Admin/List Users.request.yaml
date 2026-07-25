@@ -1,0 +1,13 @@
+$kind: http-request
+name: List Users
+method: GET
+url: "{{baseUrl}}api/v1/admin/users?page=1&limit=20"
+description: >-
+  Admin only. List seluruh user, filter opsional `role`
+  (`OWNER`/`RENTER`/`ADMIN`) dan `isActive` (`true`/`false`), pagination
+  `page`/`limit` (max 100). Balas 401 UNAUTHENTICATED kalau belum login,
+  403 FORBIDDEN kalau login tapi bukan Admin.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: List Items
+method: GET
+url: "{{baseUrl}}api/v1/admin/items?page=1&limit=20"
+description: >-
+  Admin only. List seluruh barang termasuk yang `NONAKTIF` (beda dari
+  `GET /items` publik yang default `TERSEDIA`), sertakan info owner.
+  Filter opsional `status`/`category`, pagination `page`/`limit` (max
+  100). Balas 403 FORBIDDEN kalau login tapi bukan Admin.
+queryParams:
+  page: "1"
+  limit: "20"
+order: 3000

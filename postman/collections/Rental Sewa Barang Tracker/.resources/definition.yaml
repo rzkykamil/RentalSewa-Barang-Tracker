@@ -16,3 +16,6 @@ description: |-
   Endpoint di bawah `/api/v1/**` (Get Me, Update Me, Register) hanya butuh cookie sesi aktif — tidak perlu header tambahan, asal cookie jar Postman aktif untuk environment ini.
 
   Hanya modul yang sudah diimplementasikan yang dimasukkan di sini (lihat `docs/todo/backend.md`) — modul lain (Items, Bookings, dst.) menyusul saat backend-nya dikerjakan.
+
+  ## Admin
+  Seluruh endpoint di bawah `/api/v1/admin/**` butuh sesi login dengan `role = ADMIN` (login lewat **Auth / Login (NextAuth Credentials)** memakai kredensial Admin). Balas 403 FORBIDDEN kalau sesi valid tapi bukan Admin.

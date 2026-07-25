@@ -1,0 +1,10 @@
+$kind: http-request
+name: Deactivate User
+method: PATCH
+url: "{{baseUrl}}api/v1/admin/users/{{adminUserId}}/deactivate"
+description: >-
+  Admin only. Menonaktifkan akun user (`isActive = false`). Balas 404
+  NOT_FOUND kalau user tidak ada, 422 BUSINESS_RULE_VIOLATION kalau Admin
+  mencoba menonaktifkan akunnya sendiri, 403 FORBIDDEN kalau login tapi
+  bukan Admin.
+order: 2000

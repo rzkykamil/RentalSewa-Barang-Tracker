@@ -24,3 +24,5 @@ values:
     value: ''
   - key: internalJobSecret
     value: dummy-internal-job-secret
+  - key: adminUserId
+    value: ''

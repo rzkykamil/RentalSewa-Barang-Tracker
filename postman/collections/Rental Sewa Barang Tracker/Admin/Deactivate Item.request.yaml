@@ -1,0 +1,10 @@
+$kind: http-request
+name: Deactivate Item
+method: PATCH
+url: "{{baseUrl}}api/v1/admin/items/{{itemId}}/deactivate"
+description: >-
+  Admin only. Paksa menonaktifkan barang (`status = NONAKTIF`) terlepas
+  dari siapa pemiliknya dan status saat ini (termasuk barang yang sedang
+  `DISEWA`). Balas 404 NOT_FOUND kalau barang tidak ada, 403 FORBIDDEN
+  kalau login tapi bukan Admin.
+order: 4000

@@ -52,9 +52,9 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Endpoint `GET /api/v1/items/:id/reviews`
 
 ## Modul Admin
-- [ ] Endpoint `GET /api/v1/admin/users`, `PATCH .../deactivate`
-- [ ] Endpoint `GET /api/v1/admin/items`, `PATCH .../deactivate`
-- [ ] Endpoint `GET /api/v1/admin/bookings`
+- [x] Endpoint `GET /api/v1/admin/users`, `PATCH .../deactivate`
+- [x] Endpoint `GET /api/v1/admin/items`, `PATCH .../deactivate`
+- [x] Endpoint `GET /api/v1/admin/bookings`
 
 ## Infrastruktur & Hardening
 - [ ] Docker Compose: service `app`, `worker`, `db`, `reverse-proxy` sesuai `docs/flows/system-architecture.md`
