@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import { listBookingsForAdmin } from "@/modules/admin/admin.service";
 
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     const result = await listBookingsForAdmin({ status, page, limit });
     return apiSuccess(result.bookings, { meta: { pagination: result.pagination } });
   } catch (error) {
-    console.error("[GET /api/v1/admin/bookings] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "GET /api/v1/admin/bookings" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

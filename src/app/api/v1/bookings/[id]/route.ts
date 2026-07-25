@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import { BookingAccessError, getBookingById } from "@/modules/bookings/bookings.service";
 
@@ -33,7 +34,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     if (error instanceof BookingAccessError) {
       return apiError("FORBIDDEN", "Anda tidak memiliki akses ke booking ini.");
     }
-    console.error("[GET /api/v1/bookings/:id] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "GET /api/v1/bookings/:id" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

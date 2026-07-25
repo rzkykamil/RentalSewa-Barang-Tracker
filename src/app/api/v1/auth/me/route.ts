@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import { getUserProfile, updateUserProfile } from "@/modules/auth/auth.service";
 
@@ -64,7 +65,7 @@ export async function PATCH(request: NextRequest) {
     }
     return apiSuccess(profile);
   } catch (error) {
-    console.error("[PATCH /api/v1/auth/me] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "PATCH /api/v1/auth/me" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

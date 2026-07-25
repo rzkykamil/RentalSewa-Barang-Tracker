@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { runReminderJob } from "@/modules/reminders/reminder.service";
 
 /**
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     const summary = await runReminderJob();
     return apiSuccess(summary);
   } catch (error) {
-    console.error("[POST /api/v1/internal/reminders/run] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "POST /api/v1/internal/reminders/run" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

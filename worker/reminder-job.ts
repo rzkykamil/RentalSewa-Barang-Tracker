@@ -5,32 +5,26 @@
 // so this process never depends on the Next.js server being up.
 
 import { runReminderJob } from "@/modules/reminders/reminder.service";
+import { logInfo, logError } from "@/lib/logger";
 
 async function main() {
   const startedAt = new Date();
 
   try {
     const summary = await runReminderJob();
-    console.log(
-      JSON.stringify({
-        level: "info",
-        job: "reminder",
-        startedAt: startedAt.toISOString(),
-        finishedAt: new Date().toISOString(),
-        ...summary,
-      })
-    );
+    logInfo("reminder.job_finished", {
+      job: "reminder",
+      startedAt: startedAt.toISOString(),
+      finishedAt: new Date().toISOString(),
+      ...summary,
+    });
     process.exitCode = summary.errors > 0 ? 1 : 0;
   } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: "error",
-        job: "reminder",
-        startedAt: startedAt.toISOString(),
-        finishedAt: new Date().toISOString(),
-        message: error instanceof Error ? error.message : String(error),
-      })
-    );
+    logError("reminder.job_failed", error, {
+      job: "reminder",
+      startedAt: startedAt.toISOString(),
+      finishedAt: new Date().toISOString(),
+    });
     process.exitCode = 1;
   }
 }

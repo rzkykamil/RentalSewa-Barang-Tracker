@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   BookingNotCompletedError,
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (error instanceof ReviewAlreadyExistsError) {
       return apiError("CONFLICT", "Booking ini sudah pernah direview.");
     }
-    console.error("[POST /api/v1/bookings/:id/review] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "POST /api/v1/bookings/:id/review" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

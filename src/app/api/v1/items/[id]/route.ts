@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   ItemNotFoundError,
@@ -83,7 +84,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (error instanceof ItemOwnershipError) {
       return apiError("FORBIDDEN", "Anda bukan pemilik barang ini.");
     }
-    console.error("[PATCH /api/v1/items/:id] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "PATCH /api/v1/items/:id" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }
@@ -109,7 +110,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     if (error instanceof ItemOwnershipError) {
       return apiError("FORBIDDEN", "Anda bukan pemilik barang ini.");
     }
-    console.error("[DELETE /api/v1/items/:id] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "DELETE /api/v1/items/:id" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

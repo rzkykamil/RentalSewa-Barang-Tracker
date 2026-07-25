@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   BookingNotFoundError,
@@ -48,7 +49,7 @@ export async function PATCH(_request: NextRequest, { params }: RouteParams) {
         "Booking harus berstatus ACTIVE atau LATE untuk diselesaikan."
       );
     }
-    console.error("[PATCH /api/v1/bookings/:id/complete] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "PATCH /api/v1/bookings/:id/complete" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

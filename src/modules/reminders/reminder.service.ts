@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { sendReminderEmail } from "@/lib/email";
+import { logInfo, logError } from "@/lib/logger";
 
 /**
  * Summary returned by `runReminderJob()`, surfaced via
@@ -93,18 +94,11 @@ async function runH1Reminders(
         data: { bookingId: booking.id, type: "H1_REMINDER", channel: "EMAIL" },
       });
       summary.h1RemindersSent += 1;
+      logInfo("reminder.sent", { reminderType: "H1_REMINDER", bookingId: booking.id });
     } catch (error) {
       if (isUniqueConstraintViolation(error)) continue;
       summary.errors += 1;
-      console.error(
-        JSON.stringify({
-          level: "error",
-          job: "reminder",
-          reminderType: "H1_REMINDER",
-          bookingId: booking.id,
-          message: error instanceof Error ? error.message : String(error),
-        })
-      );
+      logError("reminder.send_failed", error, { reminderType: "H1_REMINDER", bookingId: booking.id });
     }
   }
 }
@@ -149,18 +143,11 @@ async function runOverdueAlerts(today: Date, summary: ReminderJobSummary): Promi
       });
 
       summary.overdueAlertsSent += 1;
+      logInfo("reminder.sent", { reminderType: "OVERDUE_ALERT", bookingId: booking.id });
     } catch (error) {
       if (isUniqueConstraintViolation(error)) continue;
       summary.errors += 1;
-      console.error(
-        JSON.stringify({
-          level: "error",
-          job: "reminder",
-          reminderType: "OVERDUE_ALERT",
-          bookingId: booking.id,
-          message: error instanceof Error ? error.message : String(error),
-        })
-      );
+      logError("reminder.send_failed", error, { reminderType: "OVERDUE_ALERT", bookingId: booking.id });
     }
   }
 }

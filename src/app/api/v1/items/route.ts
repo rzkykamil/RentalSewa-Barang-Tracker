@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { ALLOWED_ITEM_PHOTO_MIME_TYPES, FileTooLargeError, InvalidFileTypeError } from "@/lib/upload";
 import { authOptions } from "@/modules/auth/auth-options";
 import { createItem, listItems } from "@/modules/items/items.service";
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof FileTooLargeError) {
       return apiError("VALIDATION_ERROR", "Ukuran salah satu foto melebihi batas 5MB.");
     }
-    console.error("[POST /api/v1/items] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "POST /api/v1/items" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

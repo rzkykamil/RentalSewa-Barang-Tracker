@@ -1,0 +1,13 @@
+# Reverse proxy / TLS termination in front of the `app` service
+# (docs/flows/system-architecture.md §3). Caddy auto-provisions & renews
+# Let's Encrypt certs for DOMAIN — no separate certbot setup needed.
+#
+# {$DOMAIN} / {$ACME_EMAIL} come from the compose environment (see
+# .env.example). For local development without a real domain, set
+# DOMAIN=:80 to serve plain HTTP.
+
+{$DOMAIN} {
+	tls {$ACME_EMAIL}
+
+	reverse_proxy app:3000
+}

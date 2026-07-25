@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   BookingAccessError,
@@ -54,7 +55,7 @@ export async function GET(
     if (error instanceof BookingAccessError) {
       return apiError("FORBIDDEN", "Anda tidak memiliki akses ke booking item ini.");
     }
-    console.error(`[GET /api/v1/items/${id}/bookings] unexpected error`, error);
+    logError("api.unhandled_error", error, { route: `GET /api/v1/items/${id}/bookings` });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   BookingNotFoundError,
@@ -45,7 +46,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     if (error instanceof PaymentAccessError) {
       return apiError("FORBIDDEN", "Anda tidak memiliki akses ke pembayaran booking ini.");
     }
-    console.error("[GET /api/v1/bookings/:id/payment] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "GET /api/v1/bookings/:id/payment" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }
@@ -99,7 +100,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         "Booking ini belum disetujui, data pembayaran belum ada."
       );
     }
-    console.error("[PATCH /api/v1/bookings/:id/payment] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "PATCH /api/v1/bookings/:id/payment" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

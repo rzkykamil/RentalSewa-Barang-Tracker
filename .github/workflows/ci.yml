@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# docs/technical-spec.md §9: lint -> test -> build. Deploy is manual/out of
+# scope here — see .claude/rules/git-workflow.md (no deploy without explicit
+# confirmation).
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npx tsc --noEmit
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      # No unit/integration tests exist yet (docs/todo/backend.md — written
+      # during the QA phase, docs/development-workflow.md) — passWithNoTests
+      # keeps CI green until then instead of failing on an empty suite.
+      - run: npx vitest run --passWithNoTests
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    env:
+      DATABASE_URL: "postgresql://user:password@localhost:5432/rental_sewa_barang_tracker"
+      NEXTAUTH_SECRET: "ci-build-placeholder-secret"
+      NEXTAUTH_URL: "http://localhost:3000"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # docs/technical-spec.md §12 security checklist: dependency scanning
+      # in CI. Non-blocking for now (continue-on-error) — there are known
+      # pre-existing high/critical transitive advisories (see
+      # docs/todo/backend.md Backlog) that need a separate triage pass
+      # before this can gate merges.
+      - run: npm audit --audit-level=high
+        continue-on-error: true

@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { ItemNotFoundError, listReviewsForItem } from "@/modules/reviews/reviews.service";
 
 /**
@@ -36,7 +37,7 @@ export async function GET(
     if (error instanceof ItemNotFoundError) {
       return apiError("NOT_FOUND", "Barang tidak ditemukan.");
     }
-    console.error(`[GET /api/v1/items/${id}/reviews] unexpected error`, error);
+    logError("api.unhandled_error", error, { route: `GET /api/v1/items/${id}/reviews` });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

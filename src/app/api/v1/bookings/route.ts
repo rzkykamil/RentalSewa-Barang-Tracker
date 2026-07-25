@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import {
   ItemNotAvailableError,
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof ItemNotAvailableError) {
       return apiError("CONFLICT", "Barang sedang tidak tersedia untuk disewa.");
     }
-    console.error("[POST /api/v1/bookings] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "POST /api/v1/bookings" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

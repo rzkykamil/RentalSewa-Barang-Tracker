@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { authOptions } from "@/modules/auth/auth-options";
 import { ItemNotFoundError, deactivateItemForAdmin } from "@/modules/admin/admin.service";
 
@@ -31,7 +32,7 @@ export async function PATCH(_request: NextRequest, { params }: RouteParams) {
     if (error instanceof ItemNotFoundError) {
       return apiError("NOT_FOUND", "Barang tidak ditemukan.");
     }
-    console.error(`[PATCH /api/v1/admin/items/${id}/deactivate] unexpected error`, error);
+    logError("api.unhandled_error", error, { route: `PATCH /api/v1/admin/items/${id}/deactivate` });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

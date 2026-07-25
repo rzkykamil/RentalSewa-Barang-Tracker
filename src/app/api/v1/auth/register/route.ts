@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { NextRequest } from "next/server";
 
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { logError } from "@/lib/logger";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { EmailAlreadyRegisteredError, registerUser } from "@/modules/auth/auth.service";
 
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof EmailAlreadyRegisteredError) {
       return apiError("CONFLICT", "Email ini sudah terdaftar. Gunakan email lain atau masuk.");
     }
-    console.error("[POST /api/v1/auth/register] unexpected error", error);
+    logError("api.unhandled_error", error, { route: "POST /api/v1/auth/register" });
     return apiError("INTERNAL_ERROR", "Terjadi kesalahan pada server. Coba lagi nanti.");
   }
 }

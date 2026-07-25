@@ -43,7 +43,7 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Integrasi email client (SMTP/Resend) untuk kirim reminder
 - [x] Job overdue: ubah status booking → LATE, item → TELAT_KEMBALI
 - [x] Endpoint `POST /api/v1/internal/reminders/run` (secret header, panggil service layer)
-- [ ] Setup scheduler (cron container) menjalankan job tiap 15 menit — belum ada infra Docker/cron di Phase 1 lokal, dicatat sebagai bagian item "Infrastruktur & Hardening" (Docker Compose) di bawah
+- [x] Setup scheduler (cron container) menjalankan job tiap 15 menit — lihat service `worker` di `docker-compose.yml`/`Dockerfile` (loop + `sleep 900`, bukan cron daemon terpisah, lihat `docs/decision-log.md`)
 - [ ] Unit test BR5 (idempoten, tidak kirim reminder duplikat)
 
 ## Modul Rating/Review
@@ -57,12 +57,13 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [x] Endpoint `GET /api/v1/admin/bookings`
 
 ## Infrastruktur & Hardening
-- [ ] Docker Compose: service `app`, `worker`, `db`, `reverse-proxy` sesuai `docs/flows/system-architecture.md`
-- [ ] CI pipeline: lint → test → build (lihat `docs/technical-spec.md`)
-- [ ] Security checklist: validasi input Zod di semua route, dependency scanning
-- [ ] Structured logging (JSON) untuk API & worker
+- [x] Docker Compose: service `app`, `worker`, `db`, `reverse-proxy` sesuai `docs/flows/system-architecture.md` (`docker-compose.yml`, `Dockerfile`, `Caddyfile`)
+- [x] CI pipeline: lint → test → build (`.github/workflows/ci.yml`)
+- [x] Security checklist: validasi input Zod di semua route (sudah terpenuhi sejak modul-modul sebelumnya, diverifikasi ulang di sesi ini — endpoint tanpa body/query, mis. `.../approve`, tidak butuh Zod karena hanya baca `id` dari path), dependency scanning (`.github/dependabot.yml` + `npm audit` di CI, non-blocking untuk saat ini — lihat Backlog & `docs/decision-log.md`)
+- [x] Structured logging (JSON) untuk API & worker (`src/lib/logger.ts`, dipakai di seluruh `src/app/api/v1/**`, `worker/reminder-job.ts`, dan aksi bisnis penting di `src/modules/bookings/`, `src/modules/reminders/`)
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
 
 - **Belum ada endpoint frontend-facing untuk notifikasi in-app:** `docs/api-spec.md` §Reminder hanya mendefinisikan `POST /internal/reminders/run` (server-only, dipicu scheduled job) — tidak ada endpoint `GET` yang bisa dipanggil dashboard Owner/Renter untuk mengambil daftar reminder in-app (badge/counter & halaman Notifikasi). Ditemukan saat mengerjakan frontend Modul Reminder (`src/lib/mock/reminders.ts` menurunkan reminder H-1/overdue langsung dari `MOCK_BOOKINGS` di client, bukan dari `ReminderLog`). Perlu ditambahkan mis. `GET /api/v1/reminders/me` (scoped ke user login, gabungan sebagai Owner & Renter) saat migrasi Modul Reminder backend dikerjakan — sekalian dipertimbangkan apakah butuh state "sudah dibaca" (`reminder_logs` saat ini tidak punya kolom tsb).
+- **`npm audit` di CI menemukan 19 advisory (1 critical, 13 high, 5 moderate)** pada transitive dependency (`sharp`, `postcss` lewat rantai `next`; `uuid`, `valibot`). Fix otomatis (`npm audit fix --force`) akan bump `next` ke versi di luar range yang dinyatakan project — bukan keputusan yang aman diambil sepihak tanpa user, jadi step `dependency-audit` di `.github/workflows/ci.yml` sengaja `continue-on-error` dulu (lihat `docs/decision-log.md` entry Infrastruktur & Hardening). Perlu ditriase manual (upgrade terkontrol atau terima risiko) sebelum audit ini bisa jadi gate CI yang sesungguhnya.

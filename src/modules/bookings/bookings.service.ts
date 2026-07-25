@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { logInfo } from "@/lib/logger";
 import { Prisma } from "@/generated/prisma/client";
 import type { BookingStatus } from "@/generated/prisma/enums";
 
@@ -260,6 +261,8 @@ export async function createBooking(renterId: string, input: CreateBookingInput)
     },
   });
 
+  logInfo("booking.created", { bookingId: booking.id, itemId: booking.itemId, renterId });
+
   return toBookingDto(booking);
 }
 
@@ -336,6 +339,8 @@ export async function approveBooking(bookingId: string, ownerId: string): Promis
     return updated;
   });
 
+  logInfo("booking.approved", { bookingId: approvedBooking.id, itemId: booking.itemId, ownerId });
+
   return toBookingDto(approvedBooking);
 }
 
@@ -353,6 +358,8 @@ export async function rejectBooking(bookingId: string, ownerId: string): Promise
     data: { status: "REJECTED", rejectedAt: new Date() },
   });
 
+  logInfo("booking.rejected", { bookingId: updated.id, itemId: booking.itemId, ownerId });
+
   return toBookingDto(updated);
 }
 
@@ -369,6 +376,8 @@ export async function activateBooking(bookingId: string, ownerId: string): Promi
     where: { id: bookingId },
     data: { status: "ACTIVE", activatedAt: new Date() },
   });
+
+  logInfo("booking.activated", { bookingId: updated.id, itemId: booking.itemId, ownerId });
 
   return toBookingDto(updated);
 }
@@ -401,6 +410,8 @@ export async function completeBooking(bookingId: string, ownerId: string): Promi
 
     return updated;
   });
+
+  logInfo("booking.completed", { bookingId: completedBooking.id, itemId: booking.itemId, ownerId });
 
   return toBookingDto(completedBooking);
 }
