@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { LogOut, User as UserIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -18,10 +19,11 @@ import { ReminderBell } from "@/components/reminders/ReminderBell";
 import { cn } from "@/lib/utils";
 import { DASHBOARD_NAV } from "@/lib/dashboard/nav-config";
 import { getRemindersForOwner, getRemindersForRenter } from "@/lib/mock/reminders";
-import { ROLE_LABEL, type MockUser } from "@/lib/mock/session";
+import { ROLE_LABEL } from "@/lib/mock/session";
+import type { UserProfile } from "@/modules/auth/auth.service";
 
 interface DashboardShellProps {
-  user: MockUser;
+  user: UserProfile;
   children: React.ReactNode;
 }
 
@@ -31,17 +33,15 @@ interface DashboardShellProps {
  * but the layout structure — topbar + responsive nav + content area — is
  * shared so the three shells stay visually consistent.
  *
- * There is no real session in this phase: `user` is a hardcoded mock user
- * passed in by each role's layout.tsx (see src/lib/mock/session.ts).
+ * `user` is the real profile resolved server-side by each role's
+ * layout.tsx via `getCurrentUser()`.
  */
 export function DashboardShell({ user, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const navItems = DASHBOARD_NAV[user.role];
 
   function handleLogout() {
-    // Mock only — no real session to clear yet.
-    router.push("/login");
+    signOut({ callbackUrl: "/login" });
   }
 
   const profileHref = navItems.find((item) => item.label === "Profil")?.href ?? "#";

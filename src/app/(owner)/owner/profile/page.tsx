@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 
 import { ProfileForm } from "@/components/profile/ProfileForm";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
 
 export const metadata: Metadata = {
   title: "Edit Profil — Rental Sewa Barang Tracker",
 };
 
-export default function OwnerProfilePage() {
+export default async function OwnerProfilePage() {
+  const user = await getCurrentUser();
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -16,7 +17,7 @@ export default function OwnerProfilePage() {
           Perbarui data kontak Anda supaya penyewa mudah menghubungi.
         </p>
       </div>
-      <ProfileForm user={MOCK_USERS.OWNER} />
+      <ProfileForm user={user} />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
 
-export default function RenterLayout({
+export default async function RenterLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <DashboardShell user={MOCK_USERS.RENTER}>{children}</DashboardShell>;
+  const user = await getCurrentUser();
+  return <DashboardShell user={user}>{children}</DashboardShell>;
 }

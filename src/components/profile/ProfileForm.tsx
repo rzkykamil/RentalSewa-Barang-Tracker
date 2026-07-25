@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, User as UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -8,30 +9,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/auth/FormField";
-import type { MockUser } from "@/lib/mock/session";
+import type { UserProfile } from "@/modules/auth/auth.service";
 
 interface ProfileFormErrors {
   name?: string;
 }
 
 interface ProfileFormProps {
-  user: MockUser;
+  user: UserProfile;
+}
+
+interface ProfileApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
 }
 
 /**
  * Edit-profile form shared by the Owner/Renter/Admin dashboard shells.
- * Periode 1 (frontend + mock data only): submitting simulates a network
- * request and just updates local state — no real API call to
- * /api/v1/users/me yet, and the avatar is a local preview only (no
- * upload).
+ * Submits to `PATCH /api/v1/auth/me`. The avatar field is a local preview
+ * only for now — real upload isn't wired up yet (out of scope for the Auth
+ * module; see docs/todo/frontend.md).
  */
 export function ProfileForm({ user }: ProfileFormProps) {
+  const router = useRouter();
   const [name, setName] = React.useState(user.name);
   const [phone, setPhone] = React.useState(user.phone ?? "");
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(
     user.avatarUrl
   );
   const [errors, setErrors] = React.useState<ProfileFormErrors>({});
+  const [serverError, setServerError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">(
     "idle"
   );
@@ -50,9 +56,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
     setAvatarPreview(URL.createObjectURL(file));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("idle");
+    setServerError(null);
 
     if (!name.trim()) {
       setErrors({ name: "Nama lengkap wajib diisi." });
@@ -61,10 +68,29 @@ export function ProfileForm({ user }: ProfileFormProps) {
     setErrors({});
     setStatus("loading");
 
-    // Simulated network round-trip (mock only — no real API call yet).
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/v1/auth/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: phone.trim() ? phone.trim() : null,
+        }),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as ProfileApiErrorResponse;
+        setStatus("error");
+        setServerError(body.error.message);
+        return;
+      }
+
       setStatus("success");
-    }, 800);
+      router.refresh();
+    } catch {
+      setStatus("error");
+      setServerError("Gagal terhubung ke server. Coba lagi.");
+    }
   }
 
   const isLoading = status === "loading";
@@ -141,7 +167,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           )}
           {status === "error" && (
             <p role="alert" className="text-sm font-medium text-destructive">
-              Gagal memperbarui profil. Coba lagi.
+              {serverError ?? "Gagal memperbarui profil. Coba lagi."}
             </p>
           )}
 

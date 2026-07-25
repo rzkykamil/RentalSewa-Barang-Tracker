@@ -5,10 +5,10 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani state loading/error nyata, sesuaikan kontrak kalau ada mismatch antara frontend & backend. Acuan: `docs/api-spec.md`, `docs/flows/*`.
 
 ## Modul Auth
-- [ ] Sambungkan form registrasi & login ke NextAuth (credentials provider) asli
-- [ ] Sambungkan role guard middleware ke layout dashboard per role
-- [ ] Sambungkan halaman edit profil ke endpoint update user asli
-- [ ] Ganti state loading/error mock di form auth dengan state dari API asli
+- [x] Sambungkan form registrasi & login ke NextAuth (credentials provider) asli
+- [x] Sambungkan role guard middleware ke layout dashboard per role
+- [x] Sambungkan halaman edit profil ke endpoint update user asli
+- [x] Ganti state loading/error mock di form auth dengan state dari API asli
 
 ## Modul Barang (Item)
 - [ ] Sambungkan form tambah/edit barang (termasuk upload multi-foto) ke endpoint CRUD asli

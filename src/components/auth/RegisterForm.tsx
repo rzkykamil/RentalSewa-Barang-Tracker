@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/select";
 import { FormField } from "@/components/auth/FormField";
 import { registerCopy } from "@/lib/copy/auth";
-import { MOCK_USERS, type MockRole } from "@/lib/mock/session";
+
+type RegisterableRole = "OWNER" | "RENTER";
 
 interface FieldErrors {
   name?: string;
@@ -24,24 +25,22 @@ interface FieldErrors {
   role?: string;
 }
 
+interface RegisterApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGISTERABLE_ROLES: string[] = registerCopy.roleOptions.map(
   (option) => option.value
 );
 
-/**
- * Registration form — Periode 1 (frontend + mock data only). Submitting
- * simulates a network request; there is no real call to
- * /api/v1/auth/register yet. Admin is intentionally not selectable here
- * (accounts are created manually per docs/database-design.md).
- */
 export function RegisterForm() {
   const router = useRouter();
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  const [role, setRole] = React.useState<MockRole | "">("");
+  const [role, setRole] = React.useState<RegisterableRole | "">("");
   const [fieldErrors, setFieldErrors] = React.useState<FieldErrors>({});
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<"idle" | "loading" | "success">(
@@ -71,7 +70,7 @@ export function RegisterForm() {
     return errors;
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setServerError(null);
 
@@ -81,21 +80,36 @@ export function RegisterForm() {
 
     setStatus("loading");
 
-    // Simulated network round-trip (mock only — no real registration call yet).
-    setTimeout(() => {
-      const isEmailTaken = Object.values(MOCK_USERS).some(
-        (user) => user.email.toLowerCase() === email.trim().toLowerCase()
-      );
+    try {
+      const response = await fetch("/api/v1/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+          role,
+          ...(phone.trim() ? { phone: phone.trim() } : {}),
+        }),
+      });
 
-      if (isEmailTaken) {
+      if (!response.ok) {
+        const body = (await response.json()) as RegisterApiErrorResponse;
         setStatus("idle");
-        setServerError(registerCopy.errors.emailTaken);
+        setServerError(
+          body.error.code === "CONFLICT"
+            ? registerCopy.errors.emailTaken
+            : body.error.message
+        );
         return;
       }
 
       setStatus("success");
       setTimeout(() => router.push("/login"), 1200);
-    }, 900);
+    } catch {
+      setStatus("idle");
+      setServerError("Gagal terhubung ke server. Coba lagi.");
+    }
   }
 
   const isLoading = status === "loading" || status === "success";
@@ -175,7 +189,7 @@ export function RegisterForm() {
       <FormField id="register-role" label={registerCopy.fields.role.label} error={fieldErrors.role}>
         <Select
           value={role}
-          onValueChange={(value) => setRole(value as MockRole)}
+          onValueChange={(value) => setRole(value as RegisterableRole)}
           disabled={isLoading}
         >
           <SelectTrigger
