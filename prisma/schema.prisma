@@ -33,6 +33,7 @@ model User {
   items            Item[]
   bookingsAsRenter Booking[]
   paymentsMarked   Payment[]
+  reviewsWritten   Review[]
 
   @@map("users")
 }
@@ -113,6 +114,7 @@ model Booking {
   item    Item     @relation(fields: [itemId], references: [id])
   renter  User     @relation(fields: [renterId], references: [id])
   payment Payment?
+  review  Review?
 
   reminderLogs ReminderLog[]
 
@@ -139,6 +141,20 @@ model Payment {
   markedByUser User    @relation(fields: [markedByUserId], references: [id])
 
   @@map("payments")
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  bookingId  String   @unique @map("booking_id") @db.Uuid
+  reviewerId String   @map("reviewer_id") @db.Uuid
+  rating     Int      @db.SmallInt
+  comment    String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  booking  Booking @relation(fields: [bookingId], references: [id])
+  reviewer User    @relation(fields: [reviewerId], references: [id])
+
+  @@map("reviews")
 }
 
 enum ReminderType {

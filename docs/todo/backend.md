@@ -47,9 +47,9 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 - [ ] Unit test BR5 (idempoten, tidak kirim reminder duplikat)
 
 ## Modul Rating/Review
-- [ ] Prisma schema `Review` + migration (unique per booking)
-- [ ] Endpoint `POST /api/v1/bookings/:id/review` (validasi BR4: hanya booking COMPLETED)
-- [ ] Endpoint `GET /api/v1/items/:id/reviews`
+- [x] Prisma schema `Review` + migration (unique per booking)
+- [x] Endpoint `POST /api/v1/bookings/:id/review` (validasi BR4: hanya booking COMPLETED)
+- [x] Endpoint `GET /api/v1/items/:id/reviews`
 
 ## Modul Admin
 - [ ] Endpoint `GET /api/v1/admin/users`, `PATCH .../deactivate`

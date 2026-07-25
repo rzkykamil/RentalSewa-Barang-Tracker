@@ -1,0 +1,12 @@
+$kind: http-request
+name: List Item Reviews
+method: GET
+url: "{{baseUrl}}api/v1/items/{{itemId}}/reviews?page=1&limit=20"
+description: >-
+  Public, tidak perlu login. List review untuk suatu barang (join
+  Review -> Booking -> Item), diurutkan terbaru dulu, dengan pagination
+  `page`/`limit` (default 1/20, max limit 100). Info reviewer hanya
+  menampilkan `id`/`name` (email tidak diexpose di endpoint publik ini).
+  Balas 404 NOT_FOUND kalau barang tidak ada, 400 VALIDATION_ERROR kalau
+  parameter pagination tidak valid.
+order: 2000

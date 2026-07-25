@@ -1,0 +1,22 @@
+$kind: http-request
+name: Create Review
+method: POST
+url: "{{baseUrl}}api/v1/bookings/{{bookingId}}/review"
+description: >-
+  Renter (penyewa booking tsb) only — beri rating (1-5, integer) + komentar
+  opsional (maks 1000 karakter) untuk booking yang sudah `COMPLETED` (BR4).
+  Balas 401 UNAUTHENTICATED kalau belum login, 404 NOT_FOUND kalau booking
+  tidak ada, 403 FORBIDDEN kalau login tapi bukan penyewa booking tsb, 422
+  BUSINESS_RULE_VIOLATION kalau status booking belum `COMPLETED`, 409
+  CONFLICT kalau booking ini sudah pernah direview, 400 VALIDATION_ERROR
+  kalau body tidak valid.
+order: 1000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rating": 5,
+      "comment": "Barang sesuai deskripsi, owner responsif."
+    }
