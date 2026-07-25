@@ -28,8 +28,8 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [x] Sambungkan tampilan status pembayaran di detail booking ke data asli
 
 ## Modul History
-- [ ] Sambungkan halaman riwayat transaksi per user ke query history asli
-- [ ] Sambungkan halaman riwayat transaksi per barang ke query history asli
+- [x] Sambungkan halaman riwayat transaksi per user ke query history asli
+- [x] Sambungkan halaman riwayat transaksi per barang ke query history asli
 
 ## Modul Reminder
 - [ ] Sambungkan komponen notifikasi in-app (badge/counter) ke data reminder job worker asli
@@ -51,5 +51,3 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
-
-- `src/lib/mock/payments.ts` belum bisa dihapus setelah integrasi Modul Payment Tracking selesai — `src/components/history/TransactionHistoryList.tsx` (Modul History, belum diintegrasikan) masih memakai `getPaymentByBookingId`/`bookingHasPayment`/`DEFAULT_PAYMENT_STATUS` dari file tsb. Hapus mock file ini sekalian saat mengerjakan item Modul History di atas.

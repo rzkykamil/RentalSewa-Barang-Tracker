@@ -22,25 +22,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { bookingStatusLabel } from "@/lib/copy/bookings";
+import { bookingStatusLabel, type BookingStatusValue } from "@/lib/copy/bookings";
 import { transactionHistoryCopy } from "@/lib/copy/history";
-import type { MockBooking, MockBookingStatus } from "@/lib/mock/bookings";
-import { bookingHasPayment, DEFAULT_PAYMENT_STATUS, getPaymentByBookingId } from "@/lib/mock/payments";
+import { bookingHasPayment, DEFAULT_PAYMENT_STATUS, type PaymentDto } from "@/lib/copy/payments";
 import { formatRupiah } from "@/lib/utils";
 
-const ALL_BOOKING_STATUSES: MockBookingStatus[] = [
+const ALL_BOOKING_STATUSES: BookingStatusValue[] = [
   "PENDING",
   "APPROVED",
   "ACTIVE",
+  "LATE",
   "COMPLETED",
   "REJECTED",
 ];
 
-type StatusFilter = "ALL" | MockBookingStatus;
+/** One row of a user's (or an item's) transaction history — already scoped/enriched by the calling page. */
+export interface HistoryTransaction {
+  id: string;
+  itemName: string;
+  /** Renter name when `role="OWNER"`, owner name when `role="RENTER"`. */
+  counterpartName: string;
+  startDate: string;
+  endDate: string;
+  requestedAt: string;
+  totalPrice: number;
+  status: BookingStatusValue;
+  payment: PaymentDto | null;
+}
+
+type StatusFilter = "ALL" | BookingStatusValue;
 type SortOrder = "desc" | "asc";
 
 interface TransactionHistoryListProps {
-  bookings: MockBooking[];
+  transactions: HistoryTransaction[];
   /** Determines the "counterpart" column: Renter sees the owner, Owner sees the renter. */
   role: "OWNER" | "RENTER";
   /** Set to false for compact contexts (e.g. item detail page) where filter/sort controls are not needed. */
@@ -58,11 +72,11 @@ function formatDate(dateString: string): string {
 /**
  * Reusable transaction history table for both Owner and Renter, per
  * docs/todo/frontend.md Modul History. Owner and Renter pages pass their
- * own already-scoped booking list (via getBookingsByOwner/getBookingsByRenter);
- * this component only handles status filtering, date sorting, and rendering.
+ * own already-scoped, already-enriched transaction list; this component
+ * only handles status filtering, date sorting, and rendering.
  */
 export function TransactionHistoryList({
-  bookings,
+  transactions,
   role,
   showFilters = true,
 }: TransactionHistoryListProps) {
@@ -72,17 +86,17 @@ export function TransactionHistoryList({
   const counterpartLabel =
     role === "OWNER" ? transactionHistoryCopy.table.renterColumn : transactionHistoryCopy.table.ownerColumn;
 
-  const filteredBookings = React.useMemo(() => {
+  const filteredTransactions = React.useMemo(() => {
     const filtered =
-      statusFilter === "ALL" ? bookings : bookings.filter((booking) => booking.status === statusFilter);
+      statusFilter === "ALL" ? transactions : transactions.filter((tx) => tx.status === statusFilter);
 
     return [...filtered].sort((a, b) => {
       const diff = new Date(a.requestedAt).getTime() - new Date(b.requestedAt).getTime();
       return sortOrder === "asc" ? diff : -diff;
     });
-  }, [bookings, statusFilter, sortOrder]);
+  }, [transactions, statusFilter, sortOrder]);
 
-  if (bookings.length === 0) {
+  if (transactions.length === 0) {
     return (
       <EmptyState
         title={transactionHistoryCopy.empty.noHistory.title}
@@ -135,7 +149,7 @@ export function TransactionHistoryList({
         </div>
       )}
 
-      {filteredBookings.length === 0 ? (
+      {filteredTransactions.length === 0 ? (
         <EmptyState
           title={transactionHistoryCopy.empty.noResults.title}
           description={transactionHistoryCopy.empty.noResults.description}
@@ -155,40 +169,35 @@ export function TransactionHistoryList({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredBookings.map((booking) => {
-                  const payment = getPaymentByBookingId(booking.id);
-                  const counterpartName = role === "OWNER" ? booking.renterName : booking.ownerName;
-
-                  return (
-                    <TableRow key={booking.id}>
-                      <TableCell className="max-w-48 truncate font-medium text-foreground">
-                        {booking.itemName}
-                        <span className="block text-xs font-normal text-muted-foreground sm:hidden">
-                          {counterpartLabel}: {counterpartName}
+                {filteredTransactions.map((tx) => (
+                  <TableRow key={tx.id}>
+                    <TableCell className="max-w-48 truncate font-medium text-foreground">
+                      {tx.itemName}
+                      <span className="block text-xs font-normal text-muted-foreground sm:hidden">
+                        {counterpartLabel}: {tx.counterpartName}
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden text-muted-foreground sm:table-cell">
+                      {tx.counterpartName}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(tx.startDate)} — {formatDate(tx.endDate)}
+                    </TableCell>
+                    <TableCell>{formatRupiah(tx.totalPrice)}</TableCell>
+                    <TableCell>
+                      <BookingStatusBadge status={tx.status} />
+                    </TableCell>
+                    <TableCell>
+                      {bookingHasPayment(tx.status) ? (
+                        <PaymentStatusBadge status={tx.payment?.status ?? DEFAULT_PAYMENT_STATUS} />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          {transactionHistoryCopy.table.paymentNotApplicable}
                         </span>
-                      </TableCell>
-                      <TableCell className="hidden text-muted-foreground sm:table-cell">
-                        {counterpartName}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
-                      </TableCell>
-                      <TableCell>{formatRupiah(booking.totalPrice)}</TableCell>
-                      <TableCell>
-                        <BookingStatusBadge status={booking.status} />
-                      </TableCell>
-                      <TableCell>
-                        {bookingHasPayment(booking.status) ? (
-                          <PaymentStatusBadge status={payment?.status ?? DEFAULT_PAYMENT_STATUS} />
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            {transactionHistoryCopy.table.paymentNotApplicable}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>
