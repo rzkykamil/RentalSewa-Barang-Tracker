@@ -10,7 +10,7 @@
  * real API calls and can be deleted.
  */
 
-import type { MockBookingStatus } from "@/lib/mock/bookings";
+import type { BookingStatusValue } from "@/lib/copy/bookings";
 
 /** Mirrors the `status` enum planned in docs/database-design.md `payments` table. */
 export type PaymentStatus = "BELUM_LUNAS" | "LUNAS";
@@ -30,8 +30,8 @@ export const DEFAULT_PAYMENT_STATUS: PaymentStatus = "BELUM_LUNAS";
  * booking has been approved. PENDING/REJECTED bookings have no payment to
  * track yet.
  */
-export function bookingHasPayment(status: MockBookingStatus): boolean {
-  return status === "APPROVED" || status === "ACTIVE" || status === "COMPLETED";
+export function bookingHasPayment(status: BookingStatusValue): boolean {
+  return status === "APPROVED" || status === "ACTIVE" || status === "COMPLETED" || status === "LATE";
 }
 
 export const MOCK_PAYMENTS: MockPayment[] = [

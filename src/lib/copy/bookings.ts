@@ -4,13 +4,24 @@
  * docs/prd.md NFR i18n).
  */
 
-export const bookingStatusLabel = {
+/**
+ * Superset of the mock-only `MockBookingStatus` (src/lib/mock/bookings.ts)
+ * that also covers the real `BookingStatus` enum's `LATE` value (see
+ * `src/generated/prisma/enums.ts` and BR3 in docs/prd.md) so booking status
+ * UI components can be shared between mock-data pages (Admin/History,
+ * still on Periode 4 mock data) and the now-integrated Owner/Renter booking
+ * pages without duplicating the status → label/color mapping.
+ */
+export type BookingStatusValue = "PENDING" | "APPROVED" | "ACTIVE" | "COMPLETED" | "REJECTED" | "LATE";
+
+export const bookingStatusLabel: Record<BookingStatusValue, string> = {
   PENDING: "Menunggu Persetujuan",
   APPROVED: "Disetujui",
   ACTIVE: "Sedang Berjalan",
   COMPLETED: "Selesai",
   REJECTED: "Ditolak",
-} as const;
+  LATE: "Terlambat Dikembalikan",
+};
 
 /** Ordered timeline steps for the normal booking path (REJECTED is a separate terminal state). */
 export const bookingTimelineSteps = [
@@ -40,8 +51,7 @@ export const bookingRequestFormCopy = {
   },
   submit: "Ajukan Sewa",
   submitLoading: "Mengirim permintaan...",
-  success:
-    "Permintaan sewa berhasil diajukan (mock — belum tersimpan permanen). Menunggu persetujuan pemilik.",
+  success: "Permintaan sewa berhasil diajukan. Menunggu persetujuan pemilik.",
   errors: {
     startDateRequired: "Tanggal mulai wajib diisi.",
     startDatePast: "Tanggal mulai tidak boleh di masa lalu.",
@@ -94,10 +104,10 @@ export const ownerBookingsCopy = {
     },
   },
   success: {
-    approve: "Request berhasil disetujui (mock — belum tersimpan permanen).",
-    reject: "Request berhasil ditolak (mock — belum tersimpan permanen).",
-    markActive: "Booking ditandai aktif (mock — belum tersimpan permanen).",
-    markCompleted: "Booking ditandai selesai (mock — belum tersimpan permanen).",
+    approve: "Request berhasil disetujui.",
+    reject: "Request berhasil ditolak.",
+    markActive: "Booking ditandai aktif.",
+    markCompleted: "Booking ditandai selesai.",
   },
 } as const;
 

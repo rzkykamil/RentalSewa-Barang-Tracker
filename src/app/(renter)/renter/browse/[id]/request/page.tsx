@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { BookingRequestForm } from "@/components/bookings/BookingRequestForm";
 import { bookingRequestFormCopy } from "@/lib/copy/bookings";
 import { itemDetailCopy } from "@/lib/copy/items";
-import { MOCK_ITEMS } from "@/lib/mock/items";
+import { getItemById } from "@/modules/items/items.service";
 
 export const metadata: Metadata = {
   title: "Ajukan Sewa — Rental Sewa Barang Tracker",
@@ -18,7 +18,7 @@ interface BookingRequestPageProps {
 
 export default async function BookingRequestPage({ params }: BookingRequestPageProps) {
   const { id } = await params;
-  const item = MOCK_ITEMS.find((candidate) => candidate.id === id);
+  const item = await getItemById(id);
 
   if (!item) {
     return (

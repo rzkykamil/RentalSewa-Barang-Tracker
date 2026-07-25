@@ -15,15 +15,26 @@ import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { BookingTimeline } from "@/components/bookings/BookingTimeline";
 import { PaymentStatusDisplay } from "@/components/payments/PaymentStatusDisplay";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
-import { renterBookingsCopy } from "@/lib/copy/bookings";
+import { renterBookingsCopy, type BookingStatusValue } from "@/lib/copy/bookings";
 import { reviewFormCopy } from "@/lib/copy/reviews";
-import type { MockBooking } from "@/lib/mock/bookings";
 import { hasReviewForBooking } from "@/lib/mock/items";
 import { bookingHasPayment, type MockPayment } from "@/lib/mock/payments";
 import { formatRupiah } from "@/lib/utils";
 
+/** Enriched booking (real `BookingDto` + resolved item/owner names) for the Renter "Booking Saya" page. */
+export interface RenterBooking {
+  id: string;
+  itemName: string;
+  ownerName: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  status: BookingStatusValue;
+  notes: string | null;
+}
+
 interface RenterBookingCardProps {
-  booking: MockBooking;
+  booking: RenterBooking;
   payment: MockPayment | null;
 }
 

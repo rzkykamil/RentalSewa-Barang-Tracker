@@ -3,13 +3,24 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { OwnerPaymentForm } from "@/components/payments/OwnerPaymentForm";
-import { ownerBookingsCopy } from "@/lib/copy/bookings";
-import type { MockBooking } from "@/lib/mock/bookings";
+import { ownerBookingsCopy, type BookingStatusValue } from "@/lib/copy/bookings";
 import { bookingHasPayment, type MockPayment, type PaymentStatus } from "@/lib/mock/payments";
 import { formatRupiah } from "@/lib/utils";
 
+/** Enriched booking (real `BookingDto` + resolved item/renter names) for the Owner "Request Masuk" page. */
+export interface OwnerBooking {
+  id: string;
+  itemName: string;
+  renterName: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  status: BookingStatusValue;
+  notes: string | null;
+}
+
 interface OwnerBookingCardProps {
-  booking: MockBooking;
+  booking: OwnerBooking;
   payment: MockPayment | null;
   onApprove: () => void;
   onReject: () => void;

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -28,17 +29,24 @@ function todayDateString(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+interface BookingApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
+
 /**
- * Request-sewa form for a single barang. Periode 4 (frontend + mock data
- * only): submitting simulates a network round-trip and does not create a
- * real booking record — see docs/todo/frontend.md.
+ * Request-sewa form for a single barang — submits directly to
+ * `POST /api/v1/bookings` (see docs/api-spec.md), which enforces BR1
+ * (item availability lock happens on approval) and validates the date
+ * range server-side.
  */
 export function BookingRequestForm({ itemId, itemName, pricePerDay }: BookingRequestFormProps) {
+  const router = useRouter();
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
   const [notes, setNotes] = React.useState("");
   const [errors, setErrors] = React.useState<FieldErrors>({});
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
+  const [serverError, setServerError] = React.useState<string | null>(null);
 
   const days =
     startDate && endDate && new Date(endDate) > new Date(startDate)
@@ -65,9 +73,10 @@ export function BookingRequestForm({ itemId, itemName, pricePerDay }: BookingReq
     return nextErrors;
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("idle");
+    setServerError(null);
 
     const nextErrors = validate();
     setErrors(nextErrors);
@@ -75,10 +84,34 @@ export function BookingRequestForm({ itemId, itemName, pricePerDay }: BookingReq
 
     setStatus("loading");
 
-    // Simulated network round-trip (mock only — no real persistence yet).
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/v1/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId,
+          startDate,
+          endDate,
+          notes: notes.trim() ? notes.trim() : undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as BookingApiErrorResponse;
+        setStatus("error");
+        setServerError(body.error.message);
+        return;
+      }
+
       setStatus("success");
-    }, 800);
+      router.refresh();
+      setTimeout(() => {
+        router.push("/renter/bookings");
+      }, 900);
+    } catch {
+      setStatus("error");
+      setServerError("Gagal terhubung ke server. Coba lagi.");
+    }
   }
 
   const isLoading = status === "loading";
@@ -177,7 +210,7 @@ export function BookingRequestForm({ itemId, itemName, pricePerDay }: BookingReq
           )}
           {status === "error" && (
             <p role="alert" className="text-sm font-medium text-destructive">
-              Gagal mengirim permintaan sewa. Coba lagi.
+              {serverError ?? "Gagal mengirim permintaan sewa. Coba lagi."}
             </p>
           )}
 

@@ -18,10 +18,10 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [x] Sambungkan halaman detail barang (galeri foto, rating rata-rata) ke data asli
 
 ## Modul Booking
-- [ ] Sambungkan form ajukan request sewa ke endpoint booking asli (termasuk BR1 lock ketersediaan)
-- [ ] Sambungkan dashboard Owner (approve/reject) ke endpoint status machine asli
-- [ ] Sambungkan halaman "booking saya" (Renter) ke data status timeline asli
-- [ ] Sambungkan tombol Owner "tandai aktif / tandai selesai" ke endpoint asli
+- [x] Sambungkan form ajukan request sewa ke endpoint booking asli (termasuk BR1 lock ketersediaan)
+- [x] Sambungkan dashboard Owner (approve/reject) ke endpoint status machine asli
+- [x] Sambungkan halaman "booking saya" (Renter) ke data status timeline asli
+- [x] Sambungkan tombol Owner "tandai aktif / tandai selesai" ke endpoint asli
 
 ## Modul Payment Tracking
 - [ ] Sambungkan UI tandai status pembayaran (LUNAS/BELUM_LUNAS) ke endpoint asli

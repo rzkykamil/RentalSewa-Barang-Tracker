@@ -1,12 +1,11 @@
 import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { bookingTimelineSteps } from "@/lib/copy/bookings";
-import type { MockBookingStatus } from "@/lib/mock/bookings";
+import { bookingTimelineSteps, type BookingStatusValue } from "@/lib/copy/bookings";
 
 interface BookingTimelineProps {
   /** Timeline only covers the normal path — render REJECTED separately at the call site. */
-  status: Exclude<MockBookingStatus, "REJECTED">;
+  status: Exclude<BookingStatusValue, "REJECTED">;
   className?: string;
 }
 
@@ -17,7 +16,10 @@ interface BookingTimelineProps {
  * text label so progress is not conveyed by color/position alone (§5).
  */
 export function BookingTimeline({ status, className }: BookingTimelineProps) {
-  const currentIndex = bookingTimelineSteps.findIndex((step) => step.status === status);
+  // `LATE` is a still-`ACTIVE` booking past its due date (BR3) — shown at the
+  // same "Berjalan" step as `ACTIVE` since it isn't a distinct timeline stage.
+  const effectiveStatus = status === "LATE" ? "ACTIVE" : status;
+  const currentIndex = bookingTimelineSteps.findIndex((step) => step.status === effectiveStatus);
 
   return (
     <ol className={cn("flex w-full items-start", className)}>
