@@ -1,10 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { itemStatusLabel } from "@/lib/copy/items";
-import type { MockItemStatus } from "@/lib/mock/items";
+
+/**
+ * Local status union (not imported from `@/lib/mock/items` or
+ * `@/generated/prisma/enums`) so this badge stays usable by both real
+ * `ItemDto`/`AdminItemDto` data (Modul Barang, integrated) and any
+ * still-mocked page (mis. `AdminItemsTable`, Modul Admin, not integrated
+ * yet) without a cross-module type dependency — the string values are
+ * identical to the `ItemStatus` Prisma enum either way.
+ */
+export type ItemStatusValue = "TERSEDIA" | "DISEWA" | "TELAT_KEMBALI" | "NONAKTIF";
 
 interface ItemStatusBadgeProps {
-  status: MockItemStatus;
+  status: ItemStatusValue;
   className?: string;
 }
 
@@ -13,7 +22,7 @@ interface ItemStatusBadgeProps {
  * docs/design-system.md §2 (status color mapping) and §5 (badge must show
  * a text label, not rely on color alone).
  */
-const STATUS_STYLES: Record<MockItemStatus, string> = {
+const STATUS_STYLES: Record<ItemStatusValue, string> = {
   TERSEDIA: "bg-status-positive text-status-positive-foreground",
   DISEWA: "bg-status-active text-status-active-foreground",
   TELAT_KEMBALI: "bg-status-late text-status-late-foreground",

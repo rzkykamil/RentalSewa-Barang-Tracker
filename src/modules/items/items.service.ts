@@ -163,6 +163,25 @@ export async function getItemById(itemId: string): Promise<ItemDetailDto | null>
   };
 }
 
+/**
+ * Server-side helper for the Owner "Barang Saya" dashboard page: lists every
+ * item owned by `ownerId` regardless of status (unlike `listItems`, which
+ * has no per-owner scoping and defaults `status` to `TERSEDIA`).
+ * `docs/api-spec.md` doesn't define a dedicated "my items" HTTP endpoint, so
+ * this is called directly from the Owner items list Server Component —
+ * the same pattern `getCurrentUser` already uses for `getUserProfile` (see
+ * `docs/decision-log.md`) — rather than adding a new authenticated route.
+ */
+export async function listItemsByOwner(ownerId: string): Promise<ItemDto[]> {
+  const items = await prisma.item.findMany({
+    where: { ownerId },
+    orderBy: { createdAt: "desc" },
+    include: { photos: true },
+  });
+
+  return items.map(toItemDto);
+}
+
 export interface CreateItemInput {
   name: string;
   description?: string | null;

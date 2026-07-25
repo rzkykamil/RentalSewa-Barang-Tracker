@@ -4,22 +4,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { itemConditionLabel, browseCopy } from "@/lib/copy/items";
 import { formatRupiah } from "@/lib/utils";
-import type { MockItem } from "@/lib/mock/items";
+import type { ItemDto } from "@/modules/items/items.service";
 
 interface ItemCardProps {
-  item: MockItem;
-  photoUrl?: string;
+  item: ItemDto;
   href: string;
 }
 
 /** Item summary card used on the Browse & Discovery grid. */
-export function ItemCard({ item, photoUrl, href }: ItemCardProps) {
+export function ItemCard({ item, href }: ItemCardProps) {
+  const photoUrl = item.photos.find((photo) => photo.isPrimary)?.url ?? item.photos[0]?.url;
+
   return (
     <Link href={href} className="block rounded-xl focus-visible:outline-2 focus-visible:outline-ring">
       <Card className="h-full transition-shadow hover:shadow-md">
         <div className="aspect-4/3 w-full overflow-hidden bg-muted">
           {photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- mock placeholder photo, not a real remote asset config
+            // eslint-disable-next-line @next/next/no-img-element -- served from local uploads route, not a configured remote host
             <img
               src={photoUrl}
               alt={item.name}

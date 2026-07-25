@@ -3,10 +3,15 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import type { MockItemPhoto } from "@/lib/mock/items";
+
+/** Minimal shape needed to render a photo thumbnail — matches `ItemPhotoDto`. */
+export interface ItemPhotoGalleryPhoto {
+  id: string;
+  url: string;
+}
 
 interface ItemPhotoGalleryProps {
-  photos: MockItemPhoto[];
+  photos: ItemPhotoGalleryPhoto[];
   itemName: string;
 }
 

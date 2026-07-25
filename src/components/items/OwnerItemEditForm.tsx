@@ -1,28 +1,51 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import { ItemForm } from "@/components/items/ItemForm";
 import { itemFormCopy } from "@/lib/copy/items";
-import type { MockItem, MockItemPhoto } from "@/lib/mock/items";
+import type { ItemDto } from "@/modules/items/items.service";
 
 interface OwnerItemEditFormProps {
-  item: MockItem;
-  photos: MockItemPhoto[];
+  item: ItemDto;
+}
+
+interface ItemApiErrorResponse {
+  error: { code: string; message: string };
 }
 
 /**
- * Client wrapper around the shared ItemForm for the owner edit page —
- * holds the local "nonaktifkan barang" state (client-side only, no real
- * persistence yet, see docs/todo/frontend.md).
+ * Client wrapper around the shared `ItemForm` for the owner edit page —
+ * owns the "nonaktifkan barang" action, which calls the real
+ * `DELETE /api/v1/items/:id` endpoint (soft-delete → `status = NONAKTIF`,
+ * see `deactivateItem` in `src/modules/items/items.service.ts`).
  */
-export function OwnerItemEditForm({ item, photos }: OwnerItemEditFormProps) {
+export function OwnerItemEditForm({ item }: OwnerItemEditFormProps) {
+  const router = useRouter();
   const [isDeactivated, setIsDeactivated] = React.useState(item.status === "NONAKTIF");
   const [deactivateMessage, setDeactivateMessage] = React.useState<string | null>(null);
+  const [deactivateError, setDeactivateError] = React.useState<string | null>(null);
 
-  function handleDeactivate() {
-    setIsDeactivated(true);
-    setDeactivateMessage(itemFormCopy.deactivate.success);
+  async function handleDeactivate() {
+    setDeactivateMessage(null);
+    setDeactivateError(null);
+
+    try {
+      const response = await fetch(`/api/v1/items/${item.id}`, { method: "DELETE" });
+
+      if (!response.ok) {
+        const body = (await response.json()) as ItemApiErrorResponse;
+        setDeactivateError(body.error.message);
+        return;
+      }
+
+      setIsDeactivated(true);
+      setDeactivateMessage(itemFormCopy.deactivate.success);
+      router.refresh();
+    } catch {
+      setDeactivateError("Gagal terhubung ke server. Coba lagi.");
+    }
   }
 
   return (
@@ -32,16 +55,22 @@ export function OwnerItemEditForm({ item, photos }: OwnerItemEditFormProps) {
           {deactivateMessage}
         </p>
       )}
+      {deactivateError && (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {deactivateError}
+        </p>
+      )}
       <ItemForm
         mode="edit"
+        itemId={item.id}
         initialValues={{
           name: item.name,
-          description: item.description,
+          description: item.description ?? "",
           category: item.category,
           condition: item.condition,
           pricePerDay: String(item.pricePerDay),
         }}
-        initialPhotos={photos.map((photo) => ({ id: photo.id, url: photo.url }))}
+        initialPhotos={item.photos}
         onDeactivate={handleDeactivate}
         isDeactivated={isDeactivated}
       />

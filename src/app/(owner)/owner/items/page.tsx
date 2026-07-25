@@ -14,16 +14,24 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { itemConditionLabel, itemListCopy } from "@/lib/copy/items";
-import { MOCK_ITEMS } from "@/lib/mock/items";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { listItemsByOwner, type ItemDto } from "@/modules/items/items.service";
 import { formatRupiah } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Barang Saya — Rental Sewa Barang Tracker",
 };
 
-export default function OwnerItemsPage() {
-  const ownerItems = MOCK_ITEMS.filter((item) => item.ownerId === MOCK_USERS.OWNER.id);
+export default async function OwnerItemsPage() {
+  const user = await getCurrentUser();
+
+  let ownerItems: ItemDto[] = [];
+  let loadError = false;
+  try {
+    ownerItems = await listItemsByOwner(user.id);
+  } catch {
+    loadError = true;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,7 +45,12 @@ export default function OwnerItemsPage() {
         </Button>
       </div>
 
-      {ownerItems.length === 0 ? (
+      {loadError ? (
+        <EmptyState
+          title="Gagal memuat barang"
+          description="Terjadi kesalahan saat mengambil daftar barang Anda. Coba muat ulang halaman."
+        />
+      ) : ownerItems.length === 0 ? (
         <EmptyState
           title={itemListCopy.empty.title}
           description={itemListCopy.empty.description}

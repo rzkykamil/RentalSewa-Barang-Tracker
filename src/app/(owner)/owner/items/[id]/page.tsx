@@ -2,16 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { TransactionHistoryList } from "@/components/history/TransactionHistoryList";
 import { ItemPhotoGallery } from "@/components/items/ItemPhotoGallery";
 import { ItemStatusBadge } from "@/components/items/ItemStatusBadge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { itemConditionLabel, ownerItemDetailCopy } from "@/lib/copy/items";
-import { transactionHistoryCopy } from "@/lib/copy/history";
-import { getBookingsByOwner } from "@/lib/mock/bookings";
-import { getItemPhotos, MOCK_ITEMS } from "@/lib/mock/items";
-import { MOCK_USERS } from "@/lib/mock/session";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { getItemById } from "@/modules/items/items.service";
 import { formatRupiah } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -24,23 +20,19 @@ interface OwnerItemDetailPageProps {
 
 export default async function OwnerItemDetailPage({ params }: OwnerItemDetailPageProps) {
   const { id } = await params;
-  const item = MOCK_ITEMS.find((candidate) => candidate.id === id);
+  const user = await getCurrentUser();
+  const item = await getItemById(id);
 
   // Only the owning Owner may view this page — matches the permission
   // matrix in docs/prd.md §7 (Owner can only manage their own listings).
-  if (!item || item.ownerId !== MOCK_USERS.OWNER.id) {
+  if (!item || item.ownerId !== user.id) {
     notFound();
   }
-
-  const photos = getItemPhotos(item.id);
-  const itemBookings = getBookingsByOwner(MOCK_USERS.OWNER.id).filter(
-    (booking) => booking.itemId === item.id
-  );
 
   return (
     <div className="flex flex-col gap-6">
       <div className="grid gap-6 lg:grid-cols-2">
-        <ItemPhotoGallery photos={photos} itemName={item.name} />
+        <ItemPhotoGallery photos={item.photos} itemName={item.name} />
 
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between gap-2">
@@ -72,7 +64,9 @@ export default async function OwnerItemDetailPage({ params }: OwnerItemDetailPag
             <h2 className="text-sm font-medium text-foreground">
               {ownerItemDetailCopy.descriptionTitle}
             </h2>
-            <p className="text-sm whitespace-pre-line text-muted-foreground">{item.description}</p>
+            <p className="text-sm whitespace-pre-line text-muted-foreground">
+              {item.description || "Belum ada deskripsi."}
+            </p>
           </div>
 
           <div className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -85,21 +79,6 @@ export default async function OwnerItemDetailPage({ params }: OwnerItemDetailPag
           </div>
         </div>
       </div>
-
-      <Card>
-        <CardContent className="flex flex-col gap-4">
-          <h2 className="text-sm font-medium text-foreground">
-            {transactionHistoryCopy.itemHistorySection.title}
-          </h2>
-          {itemBookings.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {transactionHistoryCopy.itemHistorySection.empty}
-            </p>
-          ) : (
-            <TransactionHistoryList bookings={itemBookings} role="OWNER" showFilters={false} />
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

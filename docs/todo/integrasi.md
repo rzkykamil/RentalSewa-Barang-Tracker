@@ -11,11 +11,11 @@ Fase integrasi = ganti mock data di frontend dengan panggilan API asli, tangani 
 - [x] Ganti state loading/error mock di form auth dengan state dari API asli
 
 ## Modul Barang (Item)
-- [ ] Sambungkan form tambah/edit barang (termasuk upload multi-foto) ke endpoint CRUD asli
-- [ ] Sambungkan tombol nonaktifkan barang ke endpoint asli
-- [ ] Sambungkan halaman daftar barang milik Owner ke data asli (badge status dari DB)
-- [ ] Sambungkan halaman Browse & Discovery ke endpoint filter/sort asli
-- [ ] Sambungkan halaman detail barang (galeri foto, rating rata-rata) ke data asli
+- [x] Sambungkan form tambah/edit barang (termasuk upload multi-foto) ke endpoint CRUD asli
+- [x] Sambungkan tombol nonaktifkan barang ke endpoint asli
+- [x] Sambungkan halaman daftar barang milik Owner ke data asli (badge status dari DB)
+- [x] Sambungkan halaman Browse & Discovery ke endpoint filter/sort asli
+- [x] Sambungkan halaman detail barang (galeri foto, rating rata-rata) ke data asli
 
 ## Modul Booking
 - [ ] Sambungkan form ajukan request sewa ke endpoint booking asli (termasuk BR1 lock ketersediaan)

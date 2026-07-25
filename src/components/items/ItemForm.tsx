@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,13 +19,14 @@ import { FormField } from "@/components/auth/FormField";
 import { PhotoUploadPreview, type PhotoPreviewItem } from "@/components/items/PhotoUploadPreview";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { itemConditionOptions, itemFormCopy } from "@/lib/copy/items";
-import type { MockItemCondition } from "@/lib/mock/items";
+import type { ItemCondition } from "@/generated/prisma/enums";
+import type { ItemPhotoDto } from "@/modules/items/items.service";
 
 export interface ItemFormValues {
   name: string;
   description: string;
   category: string;
-  condition: MockItemCondition | "";
+  condition: ItemCondition | "";
   pricePerDay: string;
 }
 
@@ -39,12 +41,21 @@ interface FieldErrors {
 
 interface ItemFormProps {
   mode: "create" | "edit";
+  /** Required in edit mode — target of `PATCH`/`DELETE /api/v1/items/:id`. */
+  itemId?: string;
   initialValues?: ItemFormValues;
-  initialPhotos?: PhotoPreviewItem[];
+  /** Existing photos, edit mode only — rendered read-only (see PATCH note below). */
+  initialPhotos?: ItemPhotoDto[];
   /** Only rendered in edit mode. */
   onDeactivate?: () => void;
   isDeactivated?: boolean;
 }
+
+interface ItemApiErrorResponse {
+  error: { code: string; message: string; details?: unknown };
+}
+
+const MAX_PHOTOS = 8;
 
 let photoIdCounter = 0;
 function nextPhotoId() {
@@ -53,26 +64,33 @@ function nextPhotoId() {
 }
 
 /**
- * Shared form for creating and editing a barang. Periode 4 (frontend +
- * mock data only): submitting simulates a network round-trip and does not
- * persist across the mock item list — see docs/todo/frontend.md.
+ * Shared form for creating and editing a barang.
+ *
+ * Create mode posts `multipart/form-data` to `POST /api/v1/items` (fields +
+ * photo files). Edit mode sends a JSON body to `PATCH /api/v1/items/:id` —
+ * that endpoint is JSON-only and doesn't accept photo uploads
+ * (`docs/decision-log.md` "PATCH /items/:id tidak menerima upload foto"), so
+ * the photos field is shown read-only in edit mode instead of editable.
  */
 export function ItemForm({
   mode,
+  itemId,
   initialValues,
   initialPhotos,
   onDeactivate,
   isDeactivated,
 }: ItemFormProps) {
+  const router = useRouter();
   const [name, setName] = React.useState(initialValues?.name ?? "");
   const [description, setDescription] = React.useState(initialValues?.description ?? "");
   const [category, setCategory] = React.useState(initialValues?.category ?? "");
-  const [condition, setCondition] = React.useState<MockItemCondition | "">(
+  const [condition, setCondition] = React.useState<ItemCondition | "">(
     initialValues?.condition ?? ""
   );
   const [pricePerDay, setPricePerDay] = React.useState(initialValues?.pricePerDay ?? "");
-  const [photos, setPhotos] = React.useState<PhotoPreviewItem[]>(initialPhotos ?? []);
+  const [photos, setPhotos] = React.useState<PhotoPreviewItem[]>([]);
   const [errors, setErrors] = React.useState<FieldErrors>({});
+  const [serverError, setServerError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">(
     "idle"
   );
@@ -90,6 +108,7 @@ export function ItemForm({
     const newPhotos = Array.from(files).map((file) => ({
       id: nextPhotoId(),
       url: URL.createObjectURL(file),
+      file,
     }));
     setPhotos((prev) => [...prev, ...newPhotos]);
   }
@@ -105,7 +124,6 @@ export function ItemForm({
   function validate(): FieldErrors {
     const nextErrors: FieldErrors = {};
     if (!name.trim()) nextErrors.name = itemFormCopy.errors.nameRequired;
-    if (!description.trim()) nextErrors.description = itemFormCopy.errors.descriptionRequired;
     if (!category.trim()) nextErrors.category = itemFormCopy.errors.categoryRequired;
     if (!condition) nextErrors.condition = itemFormCopy.errors.conditionRequired;
 
@@ -116,14 +134,21 @@ export function ItemForm({
       nextErrors.pricePerDay = itemFormCopy.errors.priceInvalid;
     }
 
-    if (photos.length === 0) nextErrors.photos = itemFormCopy.errors.photosRequired;
+    if (mode === "create") {
+      if (photos.length === 0) {
+        nextErrors.photos = itemFormCopy.errors.photosRequired;
+      } else if (photos.length > MAX_PHOTOS) {
+        nextErrors.photos = itemFormCopy.errors.photosTooMany;
+      }
+    }
 
     return nextErrors;
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("idle");
+    setServerError(null);
 
     const nextErrors = validate();
     setErrors(nextErrors);
@@ -131,13 +156,57 @@ export function ItemForm({
 
     setStatus("loading");
 
-    // Simulated network round-trip (mock only — no real persistence yet).
-    setTimeout(() => {
+    try {
+      let response: Response;
+
+      if (mode === "create") {
+        const formData = new FormData();
+        formData.set("name", name.trim());
+        if (description.trim()) formData.set("description", description.trim());
+        formData.set("category", category.trim());
+        formData.set("condition", condition);
+        formData.set("pricePerDay", pricePerDay);
+        photos.forEach((photo) => {
+          if (photo.file) formData.append("photos", photo.file);
+        });
+
+        response = await fetch("/api/v1/items", { method: "POST", body: formData });
+      } else {
+        if (!itemId) throw new Error("itemId is required in edit mode");
+
+        response = await fetch(`/api/v1/items/${itemId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            description: description.trim() ? description.trim() : null,
+            category: category.trim(),
+            condition,
+            pricePerDay: Number(pricePerDay),
+          }),
+        });
+      }
+
+      if (!response.ok) {
+        const body = (await response.json()) as ItemApiErrorResponse;
+        setStatus("error");
+        setServerError(body.error.message);
+        return;
+      }
+
+      const body = (await response.json()) as { data: { id: string } };
       setStatus("success");
-    }, 800);
+      router.refresh();
+      setTimeout(() => {
+        router.push(mode === "create" ? `/owner/items/${body.data.id}` : `/owner/items/${itemId}`);
+      }, 900);
+    } catch {
+      setStatus("error");
+      setServerError("Gagal terhubung ke server. Coba lagi.");
+    }
   }
 
-  const isLoading = status === "loading";
+  const isLoading = status === "loading" || status === "success";
 
   return (
     <Card className="max-w-2xl">
@@ -196,7 +265,7 @@ export function ItemForm({
             >
               <Select
                 value={condition}
-                onValueChange={(value) => setCondition(value as MockItemCondition)}
+                onValueChange={(value) => setCondition(value as ItemCondition)}
                 disabled={isLoading}
               >
                 <SelectTrigger
@@ -236,19 +305,32 @@ export function ItemForm({
             />
           </FormField>
 
-          <FormField
-            id="item-photos"
-            label={itemFormCopy.fields.photos.label}
-            error={errors.photos}
-            hint={errors.photos ? undefined : itemFormCopy.fields.photos.hint}
-          >
-            <PhotoUploadPreview
-              photos={photos}
-              onAdd={handleAddPhotos}
-              onRemove={handleRemovePhoto}
-              disabled={isLoading}
-            />
-          </FormField>
+          {mode === "create" ? (
+            <FormField
+              id="item-photos"
+              label={itemFormCopy.fields.photos.label}
+              error={errors.photos}
+              hint={errors.photos ? undefined : itemFormCopy.fields.photos.hint}
+            >
+              <PhotoUploadPreview
+                photos={photos}
+                onAdd={handleAddPhotos}
+                onRemove={handleRemovePhoto}
+                disabled={isLoading}
+              />
+            </FormField>
+          ) : (
+            <FormField
+              id="item-photos"
+              label={itemFormCopy.fields.photos.label}
+              hint={itemFormCopy.fields.photos.editReadOnlyHint}
+            >
+              <PhotoUploadPreview
+                photos={(initialPhotos ?? []).map((photo) => ({ id: photo.id, url: photo.url }))}
+                readOnly
+              />
+            </FormField>
+          )}
 
           {status === "success" && (
             <p role="status" className="text-sm font-medium text-status-positive">
@@ -257,7 +339,7 @@ export function ItemForm({
           )}
           {status === "error" && (
             <p role="alert" className="text-sm font-medium text-destructive">
-              Gagal menyimpan barang. Coba lagi.
+              {serverError ?? "Gagal menyimpan barang. Coba lagi."}
             </p>
           )}
 

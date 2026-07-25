@@ -39,15 +39,17 @@ export const itemFormCopy = {
     pricePerDay: { label: "Harga Sewa per Hari (Rp)", placeholder: "0" },
     photos: {
       label: "Foto Barang",
-      hint: "Unggah minimal 1 foto. Pratinjau lokal saja — unggah sungguhan belum aktif.",
+      hint: "Unggah 1–8 foto. Format JPG/PNG/WebP, maksimal 5MB per foto.",
+      editReadOnlyHint:
+        "Foto barang saat ini. Pembaruan foto belum didukung dari form edit — hubungi dukungan bila perlu mengganti foto.",
     },
   },
   submitCreate: "Simpan Barang",
   submitCreateLoading: "Menyimpan barang...",
   submitEdit: "Simpan Perubahan",
   submitEditLoading: "Menyimpan perubahan...",
-  successCreate: "Barang berhasil ditambahkan (mock — belum tersimpan permanen).",
-  successEdit: "Perubahan berhasil disimpan (mock — belum tersimpan permanen).",
+  successCreate: "Barang berhasil ditambahkan.",
+  successEdit: "Perubahan berhasil disimpan.",
   errors: {
     nameRequired: "Nama barang wajib diisi.",
     descriptionRequired: "Deskripsi wajib diisi.",
@@ -56,6 +58,7 @@ export const itemFormCopy = {
     priceRequired: "Harga sewa wajib diisi.",
     priceInvalid: "Harga sewa harus berupa angka lebih dari 0.",
     photosRequired: "Unggah minimal 1 foto barang.",
+    photosTooMany: "Maksimal 8 foto per barang.",
   },
   deactivate: {
     trigger: "Nonaktifkan Barang",
@@ -64,7 +67,7 @@ export const itemFormCopy = {
       "Barang yang nonaktif tidak akan muncul di halaman Jelajah Barang bagi penyewa. Anda bisa mengaktifkannya kembali nanti.",
     confirm: "Ya, Nonaktifkan",
     cancel: "Batal",
-    success: "Barang berhasil dinonaktifkan (mock — belum tersimpan permanen).",
+    success: "Barang berhasil dinonaktifkan.",
   },
 } as const;
 
@@ -96,14 +99,23 @@ export const browseCopy = {
     sort: {
       label: "Urutkan",
       options: [
-        { value: "price-asc", label: "Harga Terendah" },
-        { value: "price-desc", label: "Harga Tertinggi" },
+        { value: "price_asc", label: "Harga Terendah" },
+        { value: "price_desc", label: "Harga Tertinggi" },
       ],
     },
   },
   empty: {
     title: "Tidak ada barang ditemukan",
     description: "Coba ubah filter kategori atau rentang harga Anda.",
+  },
+  loadError: {
+    title: "Gagal memuat barang",
+    description: "Terjadi kesalahan saat mengambil daftar barang. Coba muat ulang halaman.",
+  },
+  pagination: {
+    previous: "Sebelumnya",
+    next: "Selanjutnya",
+    summary: (page: number, totalPages: number) => `Halaman ${page} dari ${totalPages}`,
   },
   perDay: "/hari",
 } as const;
@@ -122,11 +134,12 @@ export const ownerItemDetailCopy = {
 export const itemDetailCopy = {
   perDay: "/hari",
   conditionLabel: "Kondisi",
-  ownerLabel: "Pemilik",
+  categoryLabel: "Kategori",
   ratingNoReviews: "Belum ada ulasan",
   ratingCount: (count: number) => `(${count} ulasan)`,
   descriptionTitle: "Deskripsi",
   reviewsTitle: "Ulasan Penyewa",
+  reviewsLoadError: "Gagal memuat ulasan. Coba muat ulang halaman.",
   requestButton: "Ajukan Sewa",
   requestButtonDisabledHint: "Barang ini sedang tidak tersedia untuk disewa.",
   notFoundTitle: "Barang tidak ditemukan",
