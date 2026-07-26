@@ -29,8 +29,8 @@ Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/tes
 - [ ] Test manual: journey Payment Tracking end-to-end
 
 ## Modul History
-- [ ] Test case: riwayat transaksi per user (filter status, urut tanggal)
-- [ ] Test case: riwayat transaksi per barang (khusus Owner)
+- [x] Test case: riwayat transaksi per user (filter status, urut tanggal)
+- [x] Test case: riwayat transaksi per barang (khusus Owner)
 - [ ] Test manual: journey History end-to-end
 
 ## Modul Reminder

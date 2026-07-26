@@ -5,6 +5,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { createItem } from "@/modules/items/items.service";
 import {
+  BookingAccessError,
   BookingNotFoundError,
   BookingOwnershipError,
   InvalidBookingStatusTransitionError,
@@ -14,6 +15,8 @@ import {
   approveBooking,
   completeBooking,
   createBooking,
+  listBookingsForItem,
+  listHistoryForUser,
   rejectBooking,
 } from "@/modules/bookings/bookings.service";
 
@@ -368,5 +371,176 @@ describe("Status machine booking", () => {
 
     await activateBooking(booking.id, owner.id);
     await expect(completeBooking(booking.id, otherOwner.id)).rejects.toBeInstanceOf(BookingOwnershipError);
+  });
+});
+
+describe("listHistoryForUser (riwayat transaksi per user)", () => {
+  it("mengembalikan booking milik user sebagai renter maupun owner, terurut dari yang terbaru diupdate", async () => {
+    const owner = await createOwner("history-user-sort");
+    const renter = await createRenter("history-user-sort");
+    const itemA = await createAvailableItem(owner.id, "history-user-sort-a");
+    const itemB = await createAvailableItem(owner.id, "history-user-sort-b");
+
+    // Renter membuat dua booking pada barang yang berbeda milik owner yang sama.
+    const bookingOlder = await createBooking(renter.id, {
+      itemId: itemA.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+    const bookingNewer = await createBooking(renter.id, {
+      itemId: itemB.id,
+      startDate: dateFromToday(3),
+      endDate: dateFromToday(4),
+    });
+    // Sentuh bookingOlder lagi supaya updatedAt-nya paling baru meski dibuat lebih dulu.
+    await approveBooking(bookingOlder.id, owner.id);
+
+    const resultForRenter = await listHistoryForUser(renter.id, { page: 1, limit: 20 });
+    const ids = resultForRenter.bookings.map((b) => b.id);
+    expect(ids).toContain(bookingOlder.id);
+    expect(ids).toContain(bookingNewer.id);
+    // bookingOlder diupdate paling terakhir (approve) sehingga muncul lebih dulu.
+    expect(ids.indexOf(bookingOlder.id)).toBeLessThan(ids.indexOf(bookingNewer.id));
+
+    const resultForOwner = await listHistoryForUser(owner.id, { page: 1, limit: 20 });
+    const ownerRoleEntry = resultForOwner.bookings.find((b) => b.id === bookingNewer.id);
+    expect(ownerRoleEntry?.role).toBe("OWNER");
+    const renterRoleEntry = resultForRenter.bookings.find((b) => b.id === bookingNewer.id);
+    expect(renterRoleEntry?.role).toBe("RENTER");
+  });
+
+  it("memfilter riwayat berdasarkan status booking", async () => {
+    const owner = await createOwner("history-user-filter");
+    const renter = await createRenter("history-user-filter");
+    const item = await createAvailableItem(owner.id, "history-user-filter");
+
+    const pendingBooking = await createBooking(renter.id, {
+      itemId: item.id,
+      startDate: dateFromToday(10),
+      endDate: dateFromToday(11),
+    });
+    const anotherItem = await createAvailableItem(owner.id, "history-user-filter-b");
+    const toBeApproved = await createBooking(renter.id, {
+      itemId: anotherItem.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+    await approveBooking(toBeApproved.id, owner.id);
+
+    const pendingOnly = await listHistoryForUser(renter.id, { status: "PENDING", page: 1, limit: 20 });
+    expect(pendingOnly.bookings.every((b) => b.status === "PENDING")).toBe(true);
+    expect(pendingOnly.bookings.map((b) => b.id)).toContain(pendingBooking.id);
+    expect(pendingOnly.bookings.map((b) => b.id)).not.toContain(toBeApproved.id);
+
+    const approvedOnly = await listHistoryForUser(renter.id, { status: "APPROVED", page: 1, limit: 20 });
+    expect(approvedOnly.bookings.every((b) => b.status === "APPROVED")).toBe(true);
+    expect(approvedOnly.bookings.map((b) => b.id)).toContain(toBeApproved.id);
+    expect(approvedOnly.bookings.map((b) => b.id)).not.toContain(pendingBooking.id);
+  });
+
+  it("tidak mengembalikan booking milik user lain yang tidak terkait", async () => {
+    const owner = await createOwner("history-user-isolation");
+    const renter = await createRenter("history-user-isolation");
+    const unrelatedRenter = await createRenter("history-user-isolation-unrelated");
+    const item = await createAvailableItem(owner.id, "history-user-isolation");
+
+    await createBooking(renter.id, {
+      itemId: item.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+
+    const result = await listHistoryForUser(unrelatedRenter.id, { page: 1, limit: 20 });
+    expect(result.bookings).toHaveLength(0);
+  });
+});
+
+describe("listBookingsForItem (riwayat transaksi per barang, khusus Owner)", () => {
+  it("mengembalikan seluruh booking untuk barang milik owner, terurut dari request terbaru", async () => {
+    const owner = await createOwner("history-item-sort");
+    const renterA = await createRenter("history-item-sort-a");
+    const renterB = await createRenter("history-item-sort-b");
+    const item = await createAvailableItem(owner.id, "history-item-sort");
+
+    const olderBooking = await createBooking(renterA.id, {
+      itemId: item.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+    await rejectBooking(olderBooking.id, owner.id);
+
+    const newerBooking = await createBooking(renterB.id, {
+      itemId: item.id,
+      startDate: dateFromToday(3),
+      endDate: dateFromToday(4),
+    });
+
+    const result = await listBookingsForItem(item.id, owner.id, "OWNER", { page: 1, limit: 20 });
+    const ids = result.bookings.map((b) => b.id);
+    expect(ids).toEqual([newerBooking.id, olderBooking.id]);
+  });
+
+  it("memfilter riwayat barang berdasarkan status booking", async () => {
+    const owner = await createOwner("history-item-filter");
+    const renter = await createRenter("history-item-filter");
+    const item = await createAvailableItem(owner.id, "history-item-filter");
+
+    const rejectedBooking = await createBooking(renter.id, {
+      itemId: item.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+    await rejectBooking(rejectedBooking.id, owner.id);
+
+    const anotherItem = await createAvailableItem(owner.id, "history-item-filter-b");
+    void anotherItem;
+
+    const result = await listBookingsForItem(item.id, owner.id, "OWNER", {
+      status: "REJECTED",
+      page: 1,
+      limit: 20,
+    });
+    expect(result.bookings).toHaveLength(1);
+    expect(result.bookings[0].id).toBe(rejectedBooking.id);
+  });
+
+  it("melempar BookingAccessError saat diakses oleh Owner lain (bukan pemilik barang)", async () => {
+    const owner = await createOwner("history-item-guard-owner");
+    const otherOwner = await createOwner("history-item-guard-other-owner");
+    const renter = await createRenter("history-item-guard-renter");
+    const item = await createAvailableItem(owner.id, "history-item-guard");
+
+    await createBooking(renter.id, {
+      itemId: item.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+
+    await expect(
+      listBookingsForItem(item.id, otherOwner.id, "OWNER", { page: 1, limit: 20 })
+    ).rejects.toBeInstanceOf(BookingAccessError);
+  });
+
+  it("melempar ItemNotFoundError saat itemId tidak ada", async () => {
+    const owner = await createOwner("history-item-not-found");
+    await expect(
+      listBookingsForItem(randomUUID(), owner.id, "OWNER", { page: 1, limit: 20 })
+    ).rejects.toBeInstanceOf(ItemNotFoundError);
+  });
+
+  it("mengizinkan Admin mengakses riwayat barang milik owner manapun", async () => {
+    const owner = await createOwner("history-item-admin");
+    const admin = await createOwner("history-item-admin-actor"); // role tidak dipakai, hanya butuh id valid
+    const renter = await createRenter("history-item-admin");
+    const item = await createAvailableItem(owner.id, "history-item-admin");
+
+    const booking = await createBooking(renter.id, {
+      itemId: item.id,
+      startDate: dateFromToday(1),
+      endDate: dateFromToday(2),
+    });
+
+    const result = await listBookingsForItem(item.id, admin.id, "ADMIN", { page: 1, limit: 20 });
+    expect(result.bookings.map((b) => b.id)).toContain(booking.id);
   });
 });
