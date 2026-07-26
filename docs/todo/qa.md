@@ -24,8 +24,8 @@ Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/tes
 - [ ] Test manual: journey Booking end-to-end
 
 ## Modul Payment Tracking
-- [ ] Test case: update status pembayaran (LUNAS/BELUM_LUNAS) + catatan metode
-- [ ] Test case: konsistensi status pembayaran antara tampilan Owner & Renter
+- [x] Test case: update status pembayaran (LUNAS/BELUM_LUNAS) + catatan metode
+- [x] Test case: konsistensi status pembayaran antara tampilan Owner & Renter
 - [ ] Test manual: journey Payment Tracking end-to-end
 
 ## Modul History
