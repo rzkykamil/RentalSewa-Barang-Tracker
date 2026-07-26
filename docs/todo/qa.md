@@ -18,9 +18,9 @@ Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/tes
 - [ ] Test manual: journey Barang end-to-end
 
 ## Modul Booking
-- [ ] Test case: request sewa (BR1 lock ketersediaan, validasi rentang tanggal)
-- [ ] Test case: status machine (PENDING → APPROVED → ACTIVE → COMPLETED, approve/reject)
-- [ ] Test case: `BookingStatusBadge` mapping warna sesuai `docs/design-system.md`
+- [x] Test case: request sewa (BR1 lock ketersediaan, validasi rentang tanggal)
+- [x] Test case: status machine (PENDING → APPROVED → ACTIVE → COMPLETED, approve/reject)
+- [x] Test case: `BookingStatusBadge` mapping warna sesuai `docs/design-system.md`
 - [ ] Test manual: journey Booking end-to-end
 
 ## Modul Payment Tracking
@@ -58,3 +58,5 @@ Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/tes
 
 ## Backlog / Temuan
 _(catat di sini kebutuhan/bug di luar fokus periode yang sedang berjalan — jangan langsung dikerjakan)_
+
+- **E2E lintas modul: rate limit registrasi (5/menit/IP, `src/lib/rate-limit.ts`) memicu kegagalan spurious saat seluruh suite `e2e/**` dijalankan bersamaan (bukan per file).** Setiap file `e2e/*-flow.spec.ts` melakukan beberapa kali `POST /api/v1/auth/register` dari IP dev-server yang sama; kalau total registrasi lintas file dalam window 60 detik yang sama melebihi 5, test berikutnya gagal di step "Daftar" (tetap di `/register`, bukan redirect ke `/login`) meski tidak ada bug produk. Dikonfirmasi selama QA Modul Booking: `e2e/booking-flow.spec.ts` lolos konsisten saat dijalankan sendiri, tapi gagal (bersama file lain) saat seluruh suite dijalankan berturut-turut dalam satu menit yang sama. Tidak diperbaiki di sini (di luar fokus QA Booking) — perlu didiskusikan: naikkan limit khusus test env, atau jalankan `test:e2e` per file/dengan jeda di CI.
