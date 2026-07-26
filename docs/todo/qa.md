@@ -12,9 +12,9 @@ Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/tes
 - [x] Test manual: journey auth end-to-end sesuai `docs/flows/user-flow.md`
 
 ## Modul Barang (Item)
-- [ ] Test case: CRUD barang (tambah, edit, nonaktifkan) termasuk upload foto
-- [ ] Test case: Browse & Discovery (filter kategori, rentang harga, sort)
-- [ ] Test case: detail barang (rating rata-rata, tombol ajukan sewa)
+- [x] Test case: CRUD barang (tambah, edit, nonaktifkan) termasuk upload foto
+- [x] Test case: Browse & Discovery (filter kategori, rentang harga, sort)
+- [x] Test case: detail barang (rating rata-rata, tombol ajukan sewa)
 - [ ] Test manual: journey Barang end-to-end
 
 ## Modul Booking
