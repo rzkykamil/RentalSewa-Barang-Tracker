@@ -5,11 +5,11 @@ Living document. Centang item selesai, tambahkan item baru saat muncul. Urutan m
 Fase QA = jalankan test otomatis (unit/integration/E2E sesuai `.claude/rules/testing.md`) + test manual mengikuti journey di `docs/flows/user-flow.md`. **Test case baru dibuat di fase ini**, bukan di fase frontend/backend/integrasi. Acuan: `.claude/rules/testing.md`, `docs/flows/user-flow.md`.
 
 ## Modul Auth
-- [ ] Test case: registrasi (role Owner/Renter, validasi input)
-- [ ] Test case: login (kredensial valid/invalid)
-- [ ] Test case: role guard (akses dashboard sesuai role, ditolak kalau salah role)
-- [ ] Test case: edit profil
-- [ ] Test manual: journey auth end-to-end sesuai `docs/flows/user-flow.md`
+- [x] Test case: registrasi (role Owner/Renter, validasi input)
+- [x] Test case: login (kredensial valid/invalid)
+- [x] Test case: role guard (akses dashboard sesuai role, ditolak kalau salah role)
+- [x] Test case: edit profil
+- [x] Test manual: journey auth end-to-end sesuai `docs/flows/user-flow.md`
 
 ## Modul Barang (Item)
 - [ ] Test case: CRUD barang (tambah, edit, nonaktifkan) termasuk upload foto

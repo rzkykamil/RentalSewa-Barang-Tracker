@@ -42,7 +42,6 @@ export const registerCopy = {
     passwordRequired: "Kata sandi wajib diisi.",
     passwordTooShort: "Kata sandi minimal 8 karakter.",
     roleRequired: "Pilih peran (Owner/Renter).",
-    // Simulated server-side error to demonstrate the error state (mock only).
     emailTaken: "Email ini sudah terdaftar. Gunakan email lain atau masuk.",
   },
 } as const;
@@ -62,7 +61,6 @@ export const loginCopy = {
     emailRequired: "Email wajib diisi.",
     emailInvalid: "Format email tidak valid.",
     passwordRequired: "Kata sandi wajib diisi.",
-    // Simulated server-side error to demonstrate the error state (mock only).
     invalidCredentials: "Email atau kata sandi salah.",
   },
 } as const;
